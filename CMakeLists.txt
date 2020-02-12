@@ -3,10 +3,24 @@ project(telesecure VERSION 1.0 LANGUAGES CXX)
 find_package(Td 1.6.0 REQUIRED)
 find_package(Curses REQUIRED)
 
-SET(SRC  application.cpp)
+# Sources list
+file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "src/*.cpp")
+
+# Executable
+add_executable( ${PROJECT_NAME} ${SOURCES} )
+
+
+# Options
 set(CMAKE_CXX_FLAGS_DEBUG  "-g")
-add_executable( ${PROJECT_NAME} ${SRC} )
-target_link_libraries(${PROJECT_NAME} PRIVATE Td::TdStatic)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CURSES_LIBRARIES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON) 
+
+
+# Includes
+target_include_directories( ${PROJECT_NAME} PRIVATE include )
+
+
+# Libraries
+target_link_libraries(${PROJECT_NAME} PRIVATE Td::TdStatic)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CURSES_LIBRARIES})
+
