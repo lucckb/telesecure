@@ -88,11 +88,13 @@
     "cmake.debugConfig": {
         "stopAtEntry": true,
         "type" : "lldb",
-        "externalConsole": true,
         "logging": {
                 "trace": false,
                 "engineLogging": false,
                 "traceResponse": false
+        },
+        "env": {
+            "TERMINAL" : "xterm-256color"
         },
     }
 }
