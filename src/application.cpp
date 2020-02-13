@@ -8,9 +8,13 @@
 
 #include <ncurses.h>
 #include <gui/utility.hpp>
+#include <gui/window.hpp>
 
 int main() {
-    gui::window_manager wm;
+    using namespace gui;
+    window_manager wm;
+    window wnd( 0.1, 0.1, 0.5, 0.5, color_t::red, color_t::blue, false );
+    #if 0
     mvaddstr(0, 35, "COLOR DEMO");
     mvaddstr(2, 0, "low intensity text colors (0-7)");
     mvaddstr(12, 0, "high intensity text colors (8-15)");
@@ -30,6 +34,7 @@ int main() {
     }
 
     mvaddstr(LINES - 1, 0, "press any key to quit");
+#endif
 
     refresh();
     getch();

@@ -1,5 +1,6 @@
 /** Window manager base class for ncurses
  */
+#pragma once
 
 namespace gui {
 
@@ -8,7 +9,7 @@ public:
     //! Constructor
     window_manager( );
     //! Noncopyable 1
-    window_manager( window_manager& ) = delete;
+    window_manager(window_manager&) = delete;
     //! Noncopyable 2 
     window_manager& operator=(window_manager&) = delete;
     //! Destructor

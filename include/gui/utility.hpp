@@ -1,3 +1,5 @@
+#pragma once
+
 namespace gui 
 {
     // Color base enumeration

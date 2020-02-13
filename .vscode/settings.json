@@ -1,6 +1,7 @@
 {
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "files.associations": {
+        "*.tpl": "helm",
         "__bit_reference": "cpp",
         "__config": "cpp",
         "__debug": "cpp",
@@ -73,7 +74,16 @@
         "utility": "cpp",
         "vector": "cpp",
         "*.tcc": "cpp",
-        "memory_resource": "cpp"
+        "memory_resource": "cpp",
+        "csignal": "cpp",
+        "hash_map": "cpp",
+        "strstream": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "typeindex": "cpp"
     },
     "cmake.debugConfig": {
         "stopAtEntry": false,

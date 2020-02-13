@@ -24,6 +24,7 @@ namespace _internal {
             case color_t::white:                     /* 111 */
                 return (COLOR_WHITE);
             }
+        return COLOR_BLACK;
     }
     int colornum(color_t fg, color_t bg)
     {
