@@ -86,12 +86,13 @@
         "typeindex": "cpp"
     },
     "cmake.debugConfig": {
-        "stopAtEntry": false,
+        "stopAtEntry": true,
         "type" : "lldb",
+        "externalConsole": true,
         "logging": {
                 "trace": false,
                 "engineLogging": false,
                 "traceResponse": false
-        }
+        },
     }
 }

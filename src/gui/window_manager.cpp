@@ -2,6 +2,7 @@
 #include <ncurses.h>
 #include <stdexcept>
 #include <gui/utility.hpp>
+#include <gui/window.hpp>
 
 namespace gui {
 
@@ -49,7 +50,22 @@ void window_manager::init_colorpairs()
 //! Destroy ncurses library
 void window_manager::curses_destroy()
 {   
-      endwin();			/* End curses mode	*/
+    endwin();			/* End curses mode	*/
 } 
+
+  //! Add window
+void window_manager::add_window( std::shared_ptr<window> win )
+{
+    m_winlist.push_back(std::move(win));
+}
+
+ //! Repaint all windowss
+void window_manager::repaint( )
+{
+    for( auto wnd : m_winlist ) {
+        wnd->paint();
+    }
+    refresh();
+}
 
 }

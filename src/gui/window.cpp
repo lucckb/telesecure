@@ -19,10 +19,9 @@ window::window( float rx, float ry, float crx, float cry, color_t bg, color_t fg
     : m_rx(rx), m_ry(ry), m_crx(crx), m_cry(cry), m_fg(fg), m_bg(bg), 
       m_ctx( std::make_unique<detail::window_driver_context>(ncoord()))
 {
-    draw_empty();
+ 
 }
 //! Destructor
-
 window::~window()
 {
 }
@@ -32,15 +31,15 @@ void window::resize(int rows, int cols)
 {
     m_row = rows;
     m_col = cols;
-    draw_empty();
+    paint();
 }
 
- //Draw empty window
-void window::draw_empty()
+ //! Draw empty window
+void window::paint()
 {
    auto win = m_ctx->win.get();
    setcolor(m_fg, m_bg);
-   wbkgd(win,COLOR_PAIR(1));
+   box(win,0,0);
    unsetcolor(m_fg, m_bg);
 }
 

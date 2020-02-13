@@ -22,8 +22,12 @@ namespace gui {
     //! Base class window
     class window {
     public:
+        static auto clone(float rx, float ry, float crx, float cry, color_t bg, color_t fg, bool border)
+        {
+            return std::make_shared<window>(rx,ry,crx,cry,bg,fg,border);
+        }
         //! Public constructor
-        window( float rx, float ry, float crx, float cry, color_t bg, color_t fg, bool border );
+        window(float rx, float ry, float crx, float cry, color_t bg, color_t fg, bool border);
         //! Destructor
         virtual ~window();
         //! Noncopyable 1
@@ -32,9 +36,8 @@ namespace gui {
         window& operator=(window&) = delete;
         //! Resize window
         void resize(int rows, int cols);
-    protected:
-        //Draw empty window
-        void draw_empty();
+        // Paint window
+        virtual void paint();
     protected:
         // To ncurses coordinate calculator
         auto ncoord() const noexcept -> detail::curses_coord;

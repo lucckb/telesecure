@@ -13,7 +13,9 @@
 int main() {
     using namespace gui;
     window_manager wm;
-    window wnd( 0.1, 0.1, 0.5, 0.5, color_t::red, color_t::blue, false );
+    auto wnd = window::clone( 0.1, 0.1, 0.5, 0.5, color_t::red, color_t::blue, false );
+    wm.add_window(wnd);
+    wm.repaint();
     #if 0
     mvaddstr(0, 35, "COLOR DEMO");
     mvaddstr(2, 0, "low intensity text colors (0-7)");
@@ -36,7 +38,6 @@ int main() {
     mvaddstr(LINES - 1, 0, "press any key to quit");
 #endif
 
-    refresh();
     getch();
-    endwin();
+  
 }
