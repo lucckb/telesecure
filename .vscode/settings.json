@@ -93,6 +93,7 @@
                 "engineLogging": false,
                 "traceResponse": false
         },
+        "terminal" : "external",
         "env": {
             "TERMINAL" : "xterm-256color"
         },
