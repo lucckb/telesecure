@@ -34,8 +34,6 @@ namespace gui {
         window(window&) = delete;
         //! Noncopyable 2 
         window& operator=(window&) = delete;
-        //! Resize window
-        void resize(int rows, int cols);
         // Paint window
         virtual void paint();
     protected:
@@ -49,8 +47,6 @@ namespace gui {
         color_t m_fg {};    //! Foreground color
         color_t m_bg {};    //! Background color
         bool m_border {};   //! Draw border 
-        int m_row { 80 };   //! Terminal size R
-        int m_col { 25 };   //! Terminal size C
         std::unique_ptr<detail::window_driver_context> m_ctx;
     };
 }

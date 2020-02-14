@@ -95,7 +95,7 @@
         },
         "terminal" : "external",
         "env": {
-            "TERMINAL" : "xterm-256color"
+            "TERM" : "xterm-256color"
         },
     }
 }

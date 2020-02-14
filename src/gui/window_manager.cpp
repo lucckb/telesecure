@@ -31,7 +31,6 @@ void window_manager::curses_init()
         throw std::logic_error("Your terminal does not support color");
     }
     start_color();
-    init_colorpairs();
 }
 
 //! Init colorpairs
@@ -65,7 +64,7 @@ void window_manager::repaint( )
     for( auto wnd : m_winlist ) {
         wnd->paint();
     }
-    refresh();
+    //refresh();
 }
 
 }

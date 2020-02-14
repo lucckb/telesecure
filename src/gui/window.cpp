@@ -7,6 +7,8 @@ namespace gui {
 namespace detail {
     // Window private driver context
      struct window_driver_context {
+         window_driver_context( window_driver_context& ) = delete;
+         window_driver_context& operator=(window_driver_context& ) = delete;
          window_driver_context(const detail::curses_coord& c)
             : win(newwin(c.nlines,c.ncols,c.y0,c.x0),&delwin)
         {}
@@ -26,31 +28,32 @@ window::~window()
 {
 }
 
-//! Resize window
-void window::resize(int rows, int cols)
-{
-    m_row = rows;
-    m_col = cols;
-    paint();
-}
+
 
  //! Draw empty window
 void window::paint()
 {
    auto win = m_ctx->win.get();
-   setcolor(m_fg, m_bg);
+   
+   init_pair(1, COLOR_YELLOW, COLOR_BLUE);
+   wattron(win,COLOR_PAIR(1));
    box(win,0,0);
-   unsetcolor(m_fg, m_bg);
+   wprintw(win,"Some text");                  
+   wattroff(win,COLOR_PAIR(1));
+   wrefresh(win);
+   
 }
 
 // To ncurses coordinates
 auto window::ncoord() const noexcept -> detail::curses_coord
 {
+    int row, col;
+    getmaxyx(stdscr,row,col);
     detail::curses_coord ret;
-    ret.x0 = m_col * m_rx + 0.5f;
-    ret.y0 = m_row * m_ry + 0.5f;
-    ret.nlines = m_row * m_cry + 0.5f;
-    ret.ncols = m_col * m_crx + 0.5f;
+    ret.x0 = col * m_rx + 0.5f;
+    ret.y0 = row * m_ry + 0.5f;
+    ret.nlines = row * m_cry + 0.5f;
+    ret.ncols = col * m_crx + 0.5f;
     return ret;
 }
 
