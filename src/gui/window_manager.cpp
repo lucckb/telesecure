@@ -69,10 +69,11 @@ void window_manager::add_window( std::shared_ptr<window> win )
  //! Repaint all windowss
 void window_manager::repaint( )
 {
-    refresh();
+    wnoutrefresh(stdscr);
     for( auto wnd : m_winlist ) {
         wnd->paint();
     }
+    doupdate();
 }
 
 
@@ -86,6 +87,7 @@ void window_manager::init_signals()
         []() {
             struct winsize w;
             ioctl(0, TIOCGWINSZ, &w);
+            clearok(curscr,TRUE);
             resize_term(w.ws_row,w.ws_col);
             get().resize_all();
         } );
@@ -103,10 +105,11 @@ void window_manager::init_signals()
  {
     wresize(stdscr, LINES, COLS);
     clear();
+    wnoutrefresh(stdscr);
     for( auto wnd : m_winlist ) {
         wnd->resize();
     }
-    refresh();
+    doupdate();
  }
  
 }

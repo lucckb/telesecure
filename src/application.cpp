@@ -49,9 +49,13 @@ int main() {
     using namespace gui;
     auto& wm = window_manager::get();
 
-    auto wnd = window::clone( 0.1, 0.1, 0.5, 0.5, color_t::red, color_t::blue, false );
+    auto wnd = window::clone( 0.1, 0.1, 0.5, 0.5, color_t::red, color_t::blue, true );
     wm.add_window(wnd);
     wm.repaint();
+
+    for(;;) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));  
+    }
     struct winsize w;        
     ioctl(0, TIOCGWINSZ, &w);
     for(;!kbhit();) {

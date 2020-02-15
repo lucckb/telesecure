@@ -34,12 +34,16 @@ namespace gui {
         //! Noncopyable 2 
         window& operator=(window&) = delete;
         // Paint window
-        virtual void paint();
+        void paint();
         // Resize window according to signal
         virtual void resize();
     protected:
         // To ncurses coordinate calculator
         auto ncoord() const noexcept -> detail::curses_coord;
+        // Draw window but without refresh
+        virtual void do_draw_screen() {
+            //TODO: Pure virtual function
+        }
     private:
         float m_rx {};      //! Relative x start
         float m_ry {};      //! Relative y start
