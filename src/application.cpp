@@ -1,42 +1,65 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-#include <gui/window_manager.hpp>
+
 #include <td/telegram/Client.h>
 #include <td/telegram/td_api.h>
 #include <td/telegram/td_api.hpp>
-
-#include <ncurses.h>
-#include <gui/utility.hpp>
+#include <gui/window_manager.hpp>
 #include <gui/window.hpp>
 
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <ncurses.h>
+#include <sys/ioctl.h>
+
+int kbhit(void)
+{
+    struct termios oldt, newt;
+    int ch;
+    int oldf;
+    
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+    
+    ch = getchar();
+    
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
+    
+    if(ch != EOF)
+    {
+        ungetc(ch, stdin);
+        return 1;
+    }
+    
+    return 0;
+}
+
+
+
 int main() { 
- 
+    
     using namespace gui;
-    window_manager wm;
+    auto& wm = window_manager::get();
+
     auto wnd = window::clone( 0.1, 0.1, 0.5, 0.5, color_t::red, color_t::blue, false );
     wm.add_window(wnd);
     wm.repaint();
-#if 0
-    mvaddstr(0, 35, "COLOR DEMO");
-    mvaddstr(2, 0, "low intensity text colors (0-7)");
-    mvaddstr(12, 0, "high intensity text colors (8-15)");
-    using namespace gui;
-    for (int bg = 0; bg <= 7; bg++) {
-        for (int fg = 0; fg <= 7; fg++) {
-            setcolor(color_t(fg), color_t(bg));
-            mvaddstr(fg + 3, bg * 10, "...test...");
-            unsetcolor(color_t(fg), color_t(bg));
-        }
-
-        for (int fg = 8; fg <= 15; fg++) {
-            setcolor(color_t(fg), color_t(bg));
-            mvaddstr(fg + 5, bg * 10, "...test...");
-            unsetcolor(color_t(fg), color_t(bg));
+    struct winsize w;        
+    ioctl(0, TIOCGWINSZ, &w);
+    for(;!kbhit();) {
+        if(1)
+        for(int i=0;i<=1;++i) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));  
+            resize_term(w.ws_row-5*i,w.ws_col-5*i);
+            wm.resize_all();
         }
     }
-
-    mvaddstr(LINES - 1, 0, "press any key to quit");
-#endif
-    for(;;) {}
 }

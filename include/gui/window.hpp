@@ -18,7 +18,6 @@ namespace gui {
             int y0;
         };
     }
-
     //! Base class window
     class window {
     public:
@@ -36,6 +35,8 @@ namespace gui {
         window& operator=(window&) = delete;
         // Paint window
         virtual void paint();
+        // Resize window according to signal
+        virtual void resize();
     protected:
         // To ncurses coordinate calculator
         auto ncoord() const noexcept -> detail::curses_coord;

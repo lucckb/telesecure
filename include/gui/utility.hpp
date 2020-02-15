@@ -1,4 +1,5 @@
 #pragma once
+#include <ncurses.h>
 
 namespace gui 
 {
@@ -11,11 +12,14 @@ namespace gui
     namespace _internal {
         //Color to curs color
        short curs_color(color_t fg);
-       // Pair creation
-       int colornum(color_t fg, color_t bg);
+         // Pair creation
+         int colornum(color_t fg, color_t bg);
     }
+
     //! Set font to specific color
-    void setcolor(color_t fg, color_t bg);
+    void setcolor(WINDOW* wnd, color_t fg, color_t bg);
     //! Unset font from specific color
-    void unsetcolor(color_t fg, color_t bg);
+    void unsetcolor(WINDOW* wnd, color_t fg, color_t bg);
+    //! Get the color pair ID
+    int colorpair(color_t fg, color_t bg);
 }

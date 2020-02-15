@@ -28,12 +28,13 @@ namespace _internal {
     }
     int colornum(color_t fg, color_t bg)
     {
-        const int B = 1 << 7;
+        constexpr int B = 1 << 7;
         const int bbb = (7 & int(bg)) << 4;
         const int ffff = 7 & int(fg);
         return (B | bbb | ffff);
     }
 }
+
 namespace {
     bool is_bold(color_t fg)
     {
@@ -41,23 +42,31 @@ namespace {
         return (i & int(fg)); 
     }
 }
-void setcolor(color_t fg, color_t bg)
+
+
+
+void setcolor(WINDOW *wnd, color_t fg, color_t bg)
 {
     /* set the color pair (colornum) and bold/bright (A_BOLD) */
-    attron(COLOR_PAIR(_internal::colornum(fg, bg)));
+    wattron(wnd,COLOR_PAIR(_internal::colornum(fg, bg)));
     if (is_bold(fg)) {
-        attron(A_BOLD);
+        wattron(wnd,A_BOLD);
     }
 }
 
-void unsetcolor(color_t fg, color_t bg)
+void unsetcolor(WINDOW *wnd,color_t fg, color_t bg)
 {
 /* unset the color pair (colornum) and
        bold/bright (A_BOLD) */
-    attroff(COLOR_PAIR(_internal::colornum(fg, bg)));
+    wattroff(wnd,COLOR_PAIR(_internal::colornum(fg, bg)));
     if (is_bold(fg)) {
-        attroff(A_BOLD);
+        wattroff(wnd,A_BOLD);
     }
+}
+
+int colorpair(color_t fg, color_t bg)
+{
+    return COLOR_PAIR(_internal::colornum(fg,bg));
 }
 
 }

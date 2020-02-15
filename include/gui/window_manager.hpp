@@ -11,8 +11,10 @@ namespace gui {
 
 class window_manager {
 public:
-    //! Constructor
-    window_manager( );
+    static window_manager& get() {
+        static window_manager wnd;
+        return wnd;
+    } 
     //! Noncopyable 1
     window_manager(window_manager&) = delete;
     //! Noncopyable 2 
@@ -25,15 +27,22 @@ public:
     void delete_windows();
     //! Repaint all windowss
     void repaint( );
+    //! Resize all according to the screen size
+    void resize_all();
 private:
+     //! Constructor
+    window_manager( );
     // Initialize ncurses library
     void curses_init();
     // Destroy ncurses library 
     void curses_destroy();
     //Init color pairs for terminal
     void init_colorpairs();
-    //Translate color to enum 
+    //Initialize signals
+    void init_signals();
+
 private:
+    //All Window lists (overlapping doesnt work )
     std::vector<std::shared_ptr<window>> m_winlist;
 };
 

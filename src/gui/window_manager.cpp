@@ -3,14 +3,21 @@
 #include <stdexcept>
 #include <gui/utility.hpp>
 #include <gui/window.hpp>
+#include <signal.h>
+#include <sys/ioctl.h>
+#include <system_error>
+#include <future>
 
 namespace gui {
+
 
 //! Constructor
 window_manager::window_manager()
 {
     //!Initialize ncurses
     curses_init();
+   init_signals();
+  
 }
 
 //! Destructor
@@ -31,6 +38,7 @@ void window_manager::curses_init()
         throw std::logic_error("Your terminal does not support color");
     }
     start_color();
+    init_colorpairs();
 }
 
 //! Init colorpairs
@@ -61,10 +69,44 @@ void window_manager::add_window( std::shared_ptr<window> win )
  //! Repaint all windowss
 void window_manager::repaint( )
 {
+    refresh();
     for( auto wnd : m_winlist ) {
         wnd->paint();
     }
-    //refresh();
 }
 
+
+ //Initialize signals
+void window_manager::init_signals()
+{
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(struct sigaction));
+    sa.sa_handler = [](int) {
+        auto a1 = std::async(std::launch::deferred, 
+        []() {
+            struct winsize w;
+            ioctl(0, TIOCGWINSZ, &w);
+            resize_term(w.ws_row,w.ws_col);
+            get().resize_all();
+        } );
+        a1.wait();
+    };
+    if(sigaction(SIGWINCH, &sa, nullptr)) {
+        throw std::system_error(errno,std::generic_category(),
+             "unable to register signal for SIGWINCH"
+            );
+    }
+}
+
+//Resize all windows according to the screen size
+ void window_manager::resize_all()
+ {
+    wresize(stdscr, LINES, COLS);
+    clear();
+    for( auto wnd : m_winlist ) {
+        wnd->resize();
+    }
+    refresh();
+ }
+ 
 }
