@@ -52,24 +52,24 @@ void window::paint()
 {
    auto win = m_ctx->win();
    setcolor(win, m_fg,m_bg);
-   if(m_border) box(m_ctx->winm(),0,0);
-   wbkgd(win, colorpair(m_fg,m_bg));
+   if(m_border) NC_CHECK(box(m_ctx->winm(),0,0));
+   NC_CHECK(wbkgd(win, colorpair(m_fg,m_bg)));
    do_draw_screen();
    unsetcolor(win, m_fg,m_bg);
-   if(m_border) wnoutrefresh(m_ctx->winm());
-   else wnoutrefresh(m_ctx->win());
+   if(m_border) NC_CHECK(wnoutrefresh(m_ctx->winm()));
+   else NC_CHECK(wnoutrefresh(m_ctx->win()));
 }
 
 // To ncurses coordinates
 auto window::ncoord() const noexcept -> detail::curses_coord
 {
     int row, col;
-    getmaxyx(stdscr,row,col);
     detail::curses_coord ret;
-    ret.x0 = col * m_rx + 0.5f;
-    ret.y0 = row * m_ry + 0.5f;
-    ret.nlines = row * m_cry + 0.5f;
-    ret.ncols = col * m_crx + 0.5f;
+    getmaxyx(stdscr,row,col);
+    ret.x0 = float(col) * m_rx;
+    ret.y0 = float(row) * m_ry;
+    ret.nlines = float(row) * m_cry;
+    ret.ncols = float(col) * m_crx;
     return ret;
 } 
 
@@ -79,23 +79,29 @@ void window::resize()
 {
     const auto c = ncoord();
     if(m_border) {
-        wmove(m_ctx->winm(),c.y0,c.x0);
-        wresize(m_ctx->winm(),c.nlines,c.ncols);
-        wclear(m_ctx->winm());
-        box(m_ctx->winm(),0,0);
-        wclear(m_ctx->win());
-        wmove(m_ctx->win(),0,0);
-        wresize(m_ctx->win(),c.nlines-2,c.ncols-2);
+        NC_CHECK(wmove(m_ctx->winm(),c.y0,c.x0));
+        NC_CHECK(wresize(m_ctx->winm(),c.nlines,c.ncols));
+        NC_CHECK(wclear(m_ctx->winm()));
+        NC_CHECK( box(m_ctx->winm(),0,0));
+        NC_CHECK(wclear(m_ctx->win()));
+       // wmove(m_ctx->win(),0,0);
+        NC_CHECK(wresize(m_ctx->win(),c.nlines-2,c.ncols-2));
+        
         
     } else {
-        wmove(m_ctx->win(),c.y0,c.x0);
-        wresize(m_ctx->win(),c.nlines,c.ncols);
-        wclear(m_ctx->win());
-        
+        NC_CHECK(wmove(m_ctx->win(),c.y0,c.x0));
+        NC_CHECK(wresize(m_ctx->win(),c.nlines,c.ncols));
+        NC_CHECK(wclear(m_ctx->win()));
+    }
+    {
+         wprintw(m_ctx->win(),"x0 %i y0 %i lines %i cols %i\n", c.x0, c.y0, c.nlines, c.ncols);
+         int x,y;
+         getmaxyx(stdscr, y,x);
+         wprintw(m_ctx->win(),"maxx %i maxy %i\n",x,y);
     }
     do_draw_screen();
-    if(m_border) wnoutrefresh(m_ctx->winm());
-    else wnoutrefresh(m_ctx->win());
+    if(m_border) NC_CHECK(wnoutrefresh(m_ctx->winm()));
+    else NC_CHECK(wnoutrefresh(m_ctx->win()));
 }
 
 

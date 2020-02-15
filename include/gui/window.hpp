@@ -42,7 +42,7 @@ namespace gui {
         auto ncoord() const noexcept -> detail::curses_coord;
         // Draw window but without refresh
         virtual void do_draw_screen() {
-            //TODO: Pure virtual function
+            //TODO: change Pure virtual function
         }
     private:
         float m_rx {};      //! Relative x start

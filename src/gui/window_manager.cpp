@@ -15,7 +15,7 @@ namespace gui {
 window_manager::window_manager()
 {
     //!Initialize ncurses
-    curses_init();
+   curses_init();
    init_signals();
   
 }
@@ -30,14 +30,14 @@ window_manager::~window_manager()
 void window_manager::curses_init() 
 {
     initscr();			    /* Start curses mode 		*/
-	raw();				    /* Line buffering disabled	*/
-	keypad(stdscr, TRUE);	/* We get F1, F2 etc..		*/
-	noecho();			    /* Don't echo() while we do getch */
+	NC_CHECK(raw());				    /* Line buffering disabled	*/
+	NC_CHECK(keypad(stdscr, TRUE));	/* We get F1, F2 etc..		*/
+	NC_CHECK(noecho());			    /* Don't echo() while we do getch */
     if (has_colors() == FALSE) {
         endwin();
         throw std::logic_error("Your terminal does not support color");
     }
-    start_color();
+    NC_CHECK(start_color());
     init_colorpairs();
 }
 
@@ -49,7 +49,7 @@ void window_manager::init_colorpairs()
     for (bg = 0; bg <= 7; bg++) {
         for (fg = 0; fg <= 7; fg++) {
             colorpair = _internal::colornum(color_t(fg), color_t(bg));
-            init_pair(colorpair, _internal::curs_color(color_t(fg)), _internal::curs_color(color_t(bg)));
+            NC_CHECK(init_pair(colorpair, _internal::curs_color(color_t(fg)), _internal::curs_color(color_t(bg))));
         }
     }
 }
@@ -69,11 +69,11 @@ void window_manager::add_window( std::shared_ptr<window> win )
  //! Repaint all windowss
 void window_manager::repaint( )
 {
-    wnoutrefresh(stdscr);
+    NC_CHECK(wnoutrefresh(stdscr));
     for( auto wnd : m_winlist ) {
         wnd->paint();
     }
-    doupdate();
+    NC_CHECK(doupdate());
 }
 
 
@@ -85,10 +85,11 @@ void window_manager::init_signals()
     sa.sa_handler = [](int) {
         auto a1 = std::async(std::launch::deferred, 
         []() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));  
             struct winsize w;
             ioctl(0, TIOCGWINSZ, &w);
-            clearok(curscr,TRUE);
-            resize_term(w.ws_row,w.ws_col);
+            (clearok(curscr,TRUE));
+            (resize_term(w.ws_row,w.ws_col));
             get().resize_all();
         } );
         a1.wait();
@@ -103,13 +104,13 @@ void window_manager::init_signals()
 //Resize all windows according to the screen size
  void window_manager::resize_all()
  {
-    wresize(stdscr, LINES, COLS);
-    clear();
-    wnoutrefresh(stdscr);
+    NC_CHECK(wresize(stdscr, LINES, COLS));
+    NC_CHECK(wnoutrefresh(stdscr));
+    NC_CHECK(clear());
     for( auto wnd : m_winlist ) {
         wnd->resize();
     }
-    doupdate();
+    NC_CHECK(doupdate());
  }
  
 }
