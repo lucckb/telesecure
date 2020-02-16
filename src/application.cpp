@@ -7,6 +7,7 @@
 #include <td/telegram/td_api.hpp>
 #include <gui/window_manager.hpp>
 #include <gui/window.hpp>
+#include <gui/status_bar.hpp>
 
 #include <stdio.h>
 #include <termios.h>
@@ -48,10 +49,7 @@ int main() {
     
     using namespace gui;
     auto& wm = window_manager::get();
-
-    auto wnd = window::clone( 0.0, 0.0, 1, 0.5, color_t::red, color_t::blue, true );
-    wm.add_window(wnd);
-    wnd = window::clone( 0.0, 0.6, 1, 0.2, color_t::yellow, color_t::blue, true );
+    auto wnd = status_bar::clone(color_t::green, color_t::black);
     wm.add_window(wnd);
     wm.repaint();
 

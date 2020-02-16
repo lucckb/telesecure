@@ -69,7 +69,9 @@ auto window::ncoord() const noexcept -> detail::curses_coord
     ret.x0 = float(col) * m_rx;
     ret.y0 = float(row) * m_ry;
     ret.nlines = float(row) * m_cry;
+    if(ret.nlines==0) ret.nlines++;
     ret.ncols = float(col) * m_crx;
+    if(ret.ncols==0) ret.ncols++;
     return ret;
 } 
 

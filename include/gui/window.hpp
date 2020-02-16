@@ -21,10 +21,6 @@ namespace gui {
     //! Base class window
     class window {
     public:
-        static auto clone(float rx, float ry, float crx, float cry, color_t bg, color_t fg, bool border)
-        {
-            return std::make_shared<window>(rx,ry,crx,cry,bg,fg,border);
-        }
         //! Public constructor
         window(float rx, float ry, float crx, float cry, color_t bg, color_t fg, bool border);
         //! Destructor
