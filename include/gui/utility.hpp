@@ -15,7 +15,6 @@ namespace gui
        short curs_color(color_t fg);
          // Pair creation
          int colornum(color_t fg, color_t bg);
-         void ncurses_exception( int code, const char* file, int line );
     }
 
     //! Set font to specific color
@@ -27,4 +26,3 @@ namespace gui
 }
 
 
-//#define NC_CHECK(code) _internal::ncurses_exception(code,__FILE__,__LINE__)

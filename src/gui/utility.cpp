@@ -34,12 +34,6 @@ namespace _internal {
         const int ffff = 7 & int(fg);
         return (B | bbb | ffff);
     }
-    void ncurses_exception( int code, const char* file, int line )
-    {
-        if(code!=OK) {
-            throw std::logic_error("Ncurses exception @"+std::string(file)+":"+std::to_string(line) );
-        }
-    }
 }
 
 namespace {
