@@ -28,7 +28,6 @@ namespace gui {
         status_bar(color_t bg, color_t fg);
         //Destructor
         virtual ~status_bar();
-        
         //Add newuser to watch list
         void add_user( id_t id, std::string_view name );
         //Del user from watch list
