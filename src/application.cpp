@@ -49,23 +49,18 @@ int main() {
     using namespace gui;
     auto& wm = window_manager::get();
 
-    auto wnd = window::clone( 0.0, 0.0, 1, 0.5, color_t::red, color_t::blue, false );
+    auto wnd = window::clone( 0.0, 0.0, 1, 0.5, color_t::red, color_t::blue, true );
     wm.add_window(wnd);
-    wnd = window::clone( 0.0, 0.6, 1, 0.2, color_t::yellow, color_t::blue, false );
+    wnd = window::clone( 0.0, 0.6, 1, 0.2, color_t::yellow, color_t::blue, true );
     wm.add_window(wnd);
     wm.repaint();
 
-    for(;;) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));  
+    for(;;)
+    {
+        auto c = getch();
+        if(c=='r') {
+          wm.repaint();
+        } else if(c==27) break;
     }
-    struct winsize w;        
-    ioctl(0, TIOCGWINSZ, &w);
-    for(;!kbhit();) {
-        if(1)
-        for(int i=0;i<=1;++i) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));  
-            resize_term(w.ws_row-5*i,w.ws_col-5*i);
-            wm.resize_all();
-        }
-    }
+   
 }

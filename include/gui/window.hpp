@@ -41,9 +41,7 @@ namespace gui {
         // To ncurses coordinate calculator
         auto ncoord() const noexcept -> detail::curses_coord;
         // Draw window but without refresh
-        virtual void do_draw_screen() {
-            //TODO: change Pure virtual function
-        }
+        virtual void do_draw_screen() = 0;
     private:
         float m_rx {};      //! Relative x start
         float m_ry {};      //! Relative y start

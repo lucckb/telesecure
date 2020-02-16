@@ -52,12 +52,12 @@ void window::paint()
 {
    auto win = m_ctx->win();
    setcolor(win, m_fg,m_bg);
-   if(m_border) NC_CHECK(box(m_ctx->winm(),0,0));
-   NC_CHECK(wbkgd(win, colorpair(m_fg,m_bg)));
+   if(m_border) box(m_ctx->winm(),0,0);
+   wbkgd(win, colorpair(m_fg,m_bg));
    do_draw_screen();
    unsetcolor(win, m_fg,m_bg);
-   if(m_border) NC_CHECK(wnoutrefresh(m_ctx->winm()));
-   else NC_CHECK(wnoutrefresh(m_ctx->win()));
+   if(m_border) wnoutrefresh(m_ctx->winm());
+   else wnoutrefresh(m_ctx->win());
 }
 
 // To ncurses coordinates
@@ -79,29 +79,26 @@ void window::resize()
 {
     const auto c = ncoord();
     if(m_border) {
-        NC_CHECK(wmove(m_ctx->winm(),c.y0,c.x0));
-        NC_CHECK(wresize(m_ctx->winm(),c.nlines,c.ncols));
-        NC_CHECK(wclear(m_ctx->winm()));
-        NC_CHECK( box(m_ctx->winm(),0,0));
-        NC_CHECK(wclear(m_ctx->win()));
-       // wmove(m_ctx->win(),0,0);
-        NC_CHECK(wresize(m_ctx->win(),c.nlines-2,c.ncols-2));
-        
+        mvwin(m_ctx->winm(),c.y0,c.x0);
+        wresize(m_ctx->winm(),c.nlines,c.ncols);
+        wclear(m_ctx->winm());  
+        box(m_ctx->winm(),0,0);
+  
+        mvwin(m_ctx->win(),c.y0+1,c.y0+1);
+        wresize(m_ctx->win(),c.nlines-2,c.ncols-2);
+        wclear(m_ctx->win());
+      
         
     } else {
-        NC_CHECK(wmove(m_ctx->win(),c.y0,c.x0));
-        NC_CHECK(wresize(m_ctx->win(),c.nlines,c.ncols));
-        NC_CHECK(wclear(m_ctx->win()));
-    }
-    {
-         wprintw(m_ctx->win(),"x0 %i y0 %i lines %i cols %i\n", c.x0, c.y0, c.nlines, c.ncols);
-         int x,y;
-         getmaxyx(stdscr, y,x);
-         wprintw(m_ctx->win(),"maxx %i maxy %i\n",x,y);
+        mvwin(m_ctx->win(),c.y0,c.x0);
+        wresize(m_ctx->win(),c.nlines,c.ncols);
+        wclear(m_ctx->win());
     }
     do_draw_screen();
-    if(m_border) NC_CHECK(wnoutrefresh(m_ctx->winm()));
-    else NC_CHECK(wnoutrefresh(m_ctx->win()));
+    if(m_border) {
+        wnoutrefresh(m_ctx->winm());
+    }
+    else wnoutrefresh(m_ctx->win());
 }
 
 

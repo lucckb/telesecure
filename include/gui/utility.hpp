@@ -27,4 +27,4 @@ namespace gui
 }
 
 
-#define NC_CHECK(code) _internal::ncurses_exception(code,__FILE__,__LINE__)
+//#define NC_CHECK(code) _internal::ncurses_exception(code,__FILE__,__LINE__)
