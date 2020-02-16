@@ -1,39 +1,12 @@
 #include <ncurses.h>
 #include <gui/window.hpp>
 #include <gui/utility.hpp>
+#include <gui/window_driver_context.hpp>
+#include <gui/curses_coord.h>
+
 
 namespace gui {
 
-namespace detail {
-    // Window private driver context
-     struct window_driver_context {
-         static auto window(int a,int b,int c, int d, bool border)
-         {
-             return border?newwin(a,b,c,d):newwin(a,b,c,d);
-         }
-         static auto mwindow(int a,int b,int c, int d, bool border, WINDOW *wnd)
-         {
-             auto dw = derwin(wnd,a-2,b-2,1,1);
-             return border?dw:nullptr;
-         }
-         window_driver_context( window_driver_context& ) = delete;
-         window_driver_context& operator=(window_driver_context& ) = delete;
-         window_driver_context(const detail::curses_coord& c, bool border)
-            : mwin(window(c.nlines,c.ncols,c.y0,c.x0,border),&delwin)
-            , xwin(mwindow(c.nlines,c.ncols,c.y0,c.x0,border,mwin.get()),&delwin)
-        {
-        }
-        auto win() noexcept {
-            return xwin?xwin.get():mwin.get();
-        }
-        auto winm() noexcept {
-            return mwin.get();
-        }
-    private:
-        std::unique_ptr<WINDOW,decltype(&delwin)> mwin;
-        std::unique_ptr<WINDOW,decltype(&delwin)> xwin;
-    };
- }
 
 //Constructor
 window::window( float rx, float ry, float crx, float cry, color_t bg, color_t fg, bool border )
@@ -54,7 +27,7 @@ void window::paint()
    setcolor(win, m_fg,m_bg);
    if(m_border) box(m_ctx->winm(),0,0);
    wbkgd(win, colorpair(m_fg,m_bg));
-   do_draw_screen();
+   do_draw_screen(*m_ctx);
    unsetcolor(win, m_fg,m_bg);
    if(m_border) wnoutrefresh(m_ctx->winm());
    else wnoutrefresh(m_ctx->win());
@@ -96,7 +69,7 @@ void window::resize()
         wresize(m_ctx->win(),c.nlines,c.ncols);
         wclear(m_ctx->win());
     }
-    do_draw_screen();
+    do_draw_screen(*m_ctx);
     if(m_border) {
         wnoutrefresh(m_ctx->winm());
     }

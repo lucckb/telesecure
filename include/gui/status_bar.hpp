@@ -19,21 +19,27 @@ namespace gui {
             bool newmsg;            //Got new msg
         };
     public: 
+        //Create new object instance
         static auto clone(color_t bg, color_t fg)
         {
             return std::make_shared<status_bar>(bg,fg);
         }
-        void add_user( id_t id, std::string_view name );
-        void del_user( id_t id );
-        void set_online( id_t id, bool online );
-        void set_newmsg( id_t id, bool newmsg );
-        //Default constructor
+            //Default constructor
         status_bar(color_t bg, color_t fg);
         //Destructor
         virtual ~status_bar();
+        
+        //Add newuser to watch list
+        void add_user( id_t id, std::string_view name );
+        //Del user from watch list
+        void del_user( id_t id );
+        //Set user online
+        void set_online( id_t id, bool online );
+        //New msg received
+        void set_newmsg( id_t id, bool newmsg );
     protected:
         // Do draw screen function
-        virtual void do_draw_screen();
+        void do_draw_screen( detail::window_driver_context& ctx ) override;
     private:
         std::map<id_t,item> m_users;
     };

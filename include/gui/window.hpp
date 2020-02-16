@@ -6,17 +6,14 @@
 
 #include "utility.hpp"
 #include <memory>
+#include "curses_coord.h"
+
+
 
 namespace gui {
-
     namespace detail {
-        struct window_driver_context;
-        struct curses_coord {
-            int nlines;
-            int ncols;
-            int x0;
-            int y0;
-        };
+        struct curses_coord;
+        class window_driver_context;
     }
     //! Base class window
     class window {
@@ -37,7 +34,7 @@ namespace gui {
         // To ncurses coordinate calculator
         auto ncoord() const noexcept -> detail::curses_coord;
         // Draw window but without refresh
-        virtual void do_draw_screen() = 0;
+        virtual void do_draw_screen(detail::window_driver_context& ctx) = 0;
     private:
         float m_rx {};      //! Relative x start
         float m_ry {};      //! Relative y start

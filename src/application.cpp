@@ -50,6 +50,10 @@ int main() {
     using namespace gui;
     auto& wm = window_manager::get();
     auto wnd = status_bar::clone(color_t::green, color_t::black);
+    wnd->add_user(111,"Jolanta Nowaczyk");
+    wnd->add_user(112,"Piotr Dąbrowski");
+    wnd->set_newmsg(112,true);
+    wnd->set_online(111,true);
     wm.add_window(wnd);
     wm.repaint();
 
