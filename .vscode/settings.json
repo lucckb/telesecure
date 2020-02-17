@@ -83,7 +83,9 @@
         "set": "cpp",
         "cfenv": "cpp",
         "cinttypes": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "__tree": "cpp",
+        "future": "cpp"
     },
     "cmake.debugConfig": {
         "stopAtEntry": true,

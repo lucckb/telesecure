@@ -8,6 +8,7 @@
 #include <gui/window_manager.hpp>
 #include <gui/window.hpp>
 #include <gui/status_bar.hpp>
+#include <gui/chat_view.hpp>
 
 #include <stdio.h>
 #include <termios.h>
@@ -27,8 +28,14 @@ int main() {
     wnd->set_newmsg(112,true);
     wnd->set_online(111,true);
     wm.add_window(wnd);
-    wm.repaint();
 
+    auto wnd2 = chat_view::clone(color_t::yellow,color_t::black);
+    wm.add_window(wnd2);
+    //Testing lines only
+    for( int i=0;i<200;++i) {
+      wnd2->add_line( "Jaco", std::string("Linia testowa numer ") + std::to_string(i+1));
+    }
+    wm.repaint();
     for(;;)
     {
         auto c = getch();
