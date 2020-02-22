@@ -6,7 +6,6 @@
 
 #include "utility.hpp"
 #include <memory>
-#include "curses_coord.h"
 
 
 
@@ -19,30 +18,34 @@ namespace gui {
     class window {
     public:
         //! Public constructor
-        window(float rx, float ry, float crx, float cry, color_t bg, color_t fg, bool border);
+        window(int recommended_size, color_t bg, color_t fg, bool border);
         //! Destructor
         virtual ~window();
         //! Noncopyable 1
         window(window&) = delete;
         //! Noncopyable 2 
-        window& operator=(window&) = delete;
+        window& operator=(window&) = delete; 
         // Paint window
         void paint();
         // Resize window according to signal
-        virtual void resize();
+        virtual void resize(const rect& rect);
+        // Get border 
+        auto has_border() const {
+            return m_border;
+        }
+        auto recommended_size() const {
+            return m_recommended_size;
+        }
+        // Real windows create
+        void create(const rect& width);
     protected:
-        // To ncurses coordinate calculator
-        auto ncoord() const noexcept -> detail::curses_coord;
         // Draw window but without refresh
         virtual void do_draw_screen(detail::window_driver_context& ctx) = 0;
     private:
-        float m_rx {};      //! Relative x start
-        float m_ry {};      //! Relative y start
-        float m_crx {};     //! Relative size x
-        float m_cry {};     //! Relative size y
         color_t m_fg {};    //! Foreground color
         color_t m_bg {};    //! Background color
-        bool m_border {};   //! Draw border 
+        bool m_border {};   //! Draw border
+        int m_recommended_size {};  //! Recommended size
         std::unique_ptr<detail::window_driver_context> m_ctx;
     };
 }

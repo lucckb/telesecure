@@ -1,4 +1,5 @@
 #include <gui/window_driver_context.hpp>
+#include <gui/utility.hpp>
 
 namespace gui {
 namespace detail {
@@ -14,9 +15,9 @@ auto window_driver_context::mwindow(int a,int b,int c, int d, bool border, WINDO
     auto dw = derwin(wnd,a-2,b-2,1,1);
     return border?dw:nullptr;
 }
-window_driver_context::window_driver_context(const detail::curses_coord& c, bool border)
-     : mwin(window(c.nlines,c.ncols,c.y0,c.x0,border),&delwin)
-    , xwin(mwindow(c.nlines,c.ncols,c.y0,c.x0,border,mwin.get()),&delwin)
+window_driver_context::window_driver_context(const rect& c, bool border)
+     : mwin(window(c.cy,c.cx,c.y,c.x,border),&delwin)
+    , xwin(mwindow(c.cy,c.cx,c.y,c.x,border,mwin.get()),&delwin)
 {
 }
 

@@ -35,6 +35,7 @@ int main() {
     for( int i=0;i<200;++i) {
       wnd2->add_line( "Jaco", std::string("Linia testowa numer ") + std::to_string(i+1));
     }
+    wm.create_all();
     wm.repaint();
     for(;;)
     {

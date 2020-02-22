@@ -106,14 +106,56 @@ void window_manager::init_signals()
 }
 
 //Resize all windows according to the screen size
- void window_manager::resize_all()
- {
+void window_manager::resize_all()
+{
     wclear(stdscr);
     wnoutrefresh(stdscr);
+    rect r; int avg_y;
+    calc_window_coord(r,avg_y);
     for( auto wnd : m_winlist ) {
-        wnd->resize();
+        if(wnd->recommended_size()) {
+            r.cy = wnd->recommended_size();
+        } else {
+            r.cy = avg_y;
+        }
+        wnd->resize(r);
+        r.y += r.cy;
     }
     doupdate();
- }
- 
+}
+
+//! Create all windows according to the layout
+void window_manager::create_all()
+{
+    rect r; int avg_y;
+    calc_window_coord(r,avg_y);
+    for( auto wnd : m_winlist ) {
+        if(wnd->recommended_size()) {
+            r.cy = wnd->recommended_size();
+        } else {
+            r.cy = avg_y;
+        }
+        wnd->create(r);
+        r.y += r.cy;
+    }
+}
+
+// Calculate window pos
+void window_manager::calc_window_coord(rect& r, int& avg_y) const
+{
+   //Calculate full screen windows avg size
+    int ws {};
+    int nr {};
+    for( auto wnd : m_winlist ) {
+        if(wnd->recommended_size()) {
+            ws += wnd->recommended_size();
+        }
+        else nr++;
+    }
+    int x,y;
+    getmaxyx(stdscr,y,x);
+    avg_y = (y - ws)/nr;
+    r.x = 0; r.cx = x; r.y = 0;
+}
+
 }

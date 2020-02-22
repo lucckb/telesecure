@@ -8,6 +8,7 @@
 namespace gui {
 
     class window;
+    struct rect;
 
 class window_manager {
 public:
@@ -26,9 +27,11 @@ public:
     //! Delete windows
     void delete_windows();
     //! Repaint all windowss
-    void repaint( );
+    void repaint();
     //! Resize all according to the screen size
     void resize_all();
+    //! Create all windows according to the layout
+    void create_all();
 private:
      //! Constructor
     window_manager( );
@@ -40,7 +43,8 @@ private:
     void init_colorpairs();
     //Initialize signals
     void init_signals();
-
+    // Calculate window pos
+    void calc_window_coord(rect& r, int& avg_y) const;
 private:
     //All Window lists (overlapping doesnt work )
     std::vector<std::shared_ptr<window>> m_winlist;

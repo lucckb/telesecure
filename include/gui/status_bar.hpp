@@ -24,7 +24,7 @@ namespace gui {
         {
             return std::make_shared<status_bar>(bg,fg);
         }
-            //Default constructor
+        //Default constructor
         status_bar(color_t bg, color_t fg);
         //Destructor
         virtual ~status_bar();

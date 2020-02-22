@@ -12,15 +12,13 @@ namespace {
 
 //Default constructor
 status_bar::status_bar(color_t bg, color_t fg)
-     : window(0,0,1,0,bg,fg,false)
+     : window(1,bg,fg,false)
 {
-
 }
 
 //Destructor
 status_bar::~status_bar()
 {
-
 }
 
 // Do draw screen function

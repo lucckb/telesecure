@@ -10,6 +10,12 @@ namespace gui
         red, magenta, yellow, white
     };
 
+    struct rect {
+        rect() {}
+        int x {}, y {};
+        int cx {}, cy {};
+    };
+
     namespace _internal {
         //Color to curs color
        short curs_color(color_t fg);

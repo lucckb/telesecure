@@ -12,8 +12,8 @@ namespace {
 }
 
 //! Construtor
-chat_view::chat_view( color_t bg, color_t fg )
-       : window(0,0.05,1,0.95,bg,fg,false)
+chat_view::chat_view(color_t bg, color_t fg)
+       : window(0,bg,fg,false)
 {
 
 }
