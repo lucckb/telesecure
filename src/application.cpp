@@ -9,6 +9,7 @@
 #include <gui/window.hpp>
 #include <gui/status_bar.hpp>
 #include <gui/chat_view.hpp>
+#include <gui/edit_box.hpp>
 
 #include <stdio.h>
 #include <termios.h>
@@ -35,14 +36,23 @@ int main() {
     for( int i=0;i<200;++i) {
       wnd2->add_line( "Jaco", std::string("Linia testowa numer ") + std::to_string(i+1));
     }
+    auto wnd3 = edit_box::clone(color_t::red,color_t::black);
+    wm.add_window(wnd3);
     wm.create_all();
     wm.repaint();
     for(;;)
     {
         auto c = getch();
-        if(c=='r') {
-          wm.repaint();
-        } else if(c==27) break;
+        if(c==27) break;
+        else if(c == KEY_BACKSPACE || c == KEY_DC || c == 127)
+        {
+          wnd3->del_char();
+           wm.repaint();
+        }
+        else {
+           wnd3->add_new_char(c);
+           wm.repaint();
+        }
     }
    
 }

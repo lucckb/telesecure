@@ -35,6 +35,7 @@ void window::create(const rect& rect)
 {
    if(!m_ctx) {
        m_ctx = std::make_unique<detail::window_driver_context>(rect,m_border);
+       on_create(*m_ctx);
    }
 }
 

@@ -20,7 +20,7 @@ namespace gui {
         chat_view( color_t bg, color_t fb );
         //! Destructor
         virtual ~chat_view(); 
-         //Create new object instance
+        //Create new object instance
         static auto clone(color_t bg, color_t fg) {
             return std::make_shared<chat_view>(bg,fg);
         }

@@ -7,17 +7,16 @@
 #include <sys/ioctl.h>
 #include <system_error>
 #include <future>
+#include <locale.h>
 
 namespace gui {
-
 
 //! Constructor
 window_manager::window_manager()
 {
-    //!Initialize ncurses
+   //!Initialize ncurses
    curses_init();
    init_signals();
-  
 }
 
 //! Destructor
@@ -29,11 +28,15 @@ window_manager::~window_manager()
 //! Initialize ncurses library 
 void window_manager::curses_init() 
 {
+      // Set locale attributes (including encoding) from the environment
+    if (!setlocale(LC_ALL, "")) {
+           throw std::logic_error("Failed to set locale attributes from environment");
+    }
     initscr();			    /* Start curses mode 		*/
 	raw();				    /* Line buffering disabled	*/
 	keypad(stdscr, TRUE);	/* We get F1, F2 etc..		*/
 	noecho();			    /* Don't echo() while we do getch */
-    curs_set(0);            /* Disable cursor */
+    //curs_set(0);            /* Disable cursor */
     if (has_colors() == FALSE) {
         endwin();
         throw std::logic_error("Your terminal does not support color");

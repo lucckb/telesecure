@@ -41,6 +41,10 @@ namespace gui {
     protected:
         // Draw window but without refresh
         virtual void do_draw_screen(detail::window_driver_context& ctx) = 0;
+        // When window is created
+        virtual void on_create(detail::window_driver_context& ctx) {
+        
+        }
     private:
         color_t m_fg {};    //! Foreground color
         color_t m_bg {};    //! Background color
