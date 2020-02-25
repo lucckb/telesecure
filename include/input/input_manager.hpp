@@ -31,6 +31,10 @@ namespace input {
         void register_line_completed( std::function<void()> cb ) {
             m_line_completed_cb = cb;
         }
+        //Register line completed callback
+        void register_leave_session( std::function<void()> cb ) {
+            m_leave_cb = cb;
+        }
         //Handle input loop
         void loop();
     private:
@@ -38,5 +42,6 @@ namespace input {
         std::function<void()> m_delete_char_cb;
         std::function<void(int)> m_add_char_cb;
         std::function<void()> m_line_completed_cb;
+        std::function<void()> m_leave_cb;
     };
 }

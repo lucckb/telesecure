@@ -54,5 +54,8 @@ int main() {
         wm.repaint();
         //Get string here
     });
+    im.register_leave_session([&]() {
+     
+    });
     im.loop();
 }
