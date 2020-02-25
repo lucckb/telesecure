@@ -85,7 +85,8 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "__tree": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "__functional_03": "cpp"
     },
     "cmake.debugConfig": {
         "stopAtEntry": true,

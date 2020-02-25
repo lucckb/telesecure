@@ -10,19 +10,16 @@
 #include <gui/status_bar.hpp>
 #include <gui/chat_view.hpp>
 #include <gui/edit_box.hpp>
+#include <input/input_manager.hpp>
 
-#include <stdio.h>
-#include <termios.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <ncurses.h>
-#include <sys/ioctl.h>
 
 
 int main() { 
     
     using namespace gui;
+    using namespace input;
     auto& wm = window_manager::get();
+    auto& im = input_manager::get();
     auto wnd = status_bar::clone(color_t::green, color_t::black);
     wnd->add_user(111,"Jolanta Nowaczyk");
     wnd->add_user(112,"Piotr Dąbrowski");
@@ -40,19 +37,22 @@ int main() {
     wm.add_window(wnd3);
     wm.create_all();
     wm.repaint();
-    for(;;)
-    {
-        auto c = getch();
-        if(c==27) break;
-        else if(c == KEY_BACKSPACE || c == KEY_DC || c == 127)
-        {
-          wnd3->del_char();
-           wm.repaint();
-        }
-        else {
-           wnd3->add_new_char(c);
-           wm.repaint();
-        }
-    }
-   
+    im.register_switch_window([](int key) {
+        printw("KEY %i\n", key);
+        refresh();
+    });
+    im.register_add_char([&](int ch) {
+        wnd3->add_new_char(ch);
+        wm.repaint();
+    });
+    im.register_delete_char([&]() {
+        wnd3->del_char();
+        wm.repaint();
+    });
+    im.register_line_completed([&](){
+        wnd3->clear();
+        wm.repaint();
+        //Get string here
+    });
+    im.loop();
 }

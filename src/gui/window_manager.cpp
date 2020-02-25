@@ -30,11 +30,12 @@ void window_manager::curses_init()
 {
       // Set locale attributes (including encoding) from the environment
     if (!setlocale(LC_ALL, "")) {
-           throw std::logic_error("Failed to set locale attributes from environment");
+        throw std::logic_error("Failed to set locale attributes from environment");
     }
     initscr();			    /* Start curses mode 		*/
 	raw();				    /* Line buffering disabled	*/
 	keypad(stdscr, TRUE);	/* We get F1, F2 etc..		*/
+    meta(stdscr, TRUE);     /* Enable meta */
 	noecho();			    /* Don't echo() while we do getch */
     //curs_set(0);            /* Disable cursor */
     if (has_colors() == FALSE) {

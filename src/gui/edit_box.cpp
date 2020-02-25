@@ -59,6 +59,7 @@ void edit_box::del_char()
 void edit_box::clear()
 {
     m_changed = true;
+    m_delchar = true;
     m_line.clear();
 }
 
