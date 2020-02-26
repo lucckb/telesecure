@@ -7,7 +7,7 @@ namespace gui {
 
 //! Construtor
 edit_box::edit_box(color_t bg, color_t fg)
-    : window(2,bg,fg,false)
+    : window(4,bg,fg,false)
 {
 
 }
@@ -27,7 +27,7 @@ void edit_box::do_draw_screen( detail::window_driver_context& ctx )
             wclear(win);
             wprintw(win,m_line.c_str());
         } else {
-            waddch(win,m_char);
+            waddstr(win,m_char.c_str());
         }
         m_changed = false;
     }
@@ -40,7 +40,7 @@ void edit_box::on_create(detail::window_driver_context& ctx)
 }
 
 //Add new character to the string
-void edit_box::add_new_char( int ch )
+void edit_box::add_new_char( std::string_view ch )
 {
     m_char = ch;
     m_changed = true;

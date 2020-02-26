@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <functional>
-
+#include <string>
 
 namespace input {
 
@@ -24,7 +24,7 @@ namespace input {
             m_delete_char_cb = cb;
         }
         //Register add char callback
-        void register_add_char( std::function<void(int)> cb ) {
+        void register_add_char( std::function<void(std::string_view)> cb ) {
             m_add_char_cb = cb;
         }
         //Register line completed callback
@@ -40,7 +40,7 @@ namespace input {
     private:
         std::function<void(int)> m_switch_window_cb;
         std::function<void()> m_delete_char_cb;
-        std::function<void(int)> m_add_char_cb;
+        std::function<void(std::string_view)> m_add_char_cb;
         std::function<void()> m_line_completed_cb;
         std::function<void()> m_leave_cb;
     };

@@ -8,6 +8,7 @@
 #include <system_error>
 #include <future>
 #include <locale.h>
+#include <cstring>
 
 namespace gui {
 

@@ -6,6 +6,8 @@ find_package(Td 1.6.0 REQUIRED)
 find_package(Curses REQUIRED)
 find_package(Readline REQUIRED)
 
+#Compiler definiton
+add_compile_definitions(_XOPEN_SOURCE_EXTENDED)
 
 # Sources list
 file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "src/*.cpp")

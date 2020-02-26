@@ -18,13 +18,13 @@ namespace gui {
         // When window is created
         void on_create(detail::window_driver_context& ctx) override;
         //Add new character to the string
-        void add_new_char( int ch );
+        void add_new_char( std::string_view ch );
         //Delete char at cursor
         void del_char();
         // Clear buffer 
         void clear();
     private:
-        int m_char {};
+        std::string m_char {};
         bool m_changed {};
         bool m_delchar {};
         std::string m_line;

@@ -13,7 +13,6 @@
 #include <input/input_manager.hpp>
 
 
-
 int main() { 
     
     using namespace gui;
@@ -41,7 +40,7 @@ int main() {
         printw("KEY %i\n", key);
         refresh();
     });
-    im.register_add_char([&](int ch) {
+    im.register_add_char([&](std::string_view ch) {
         wnd3->add_new_char(ch);
         wm.repaint();
     });
