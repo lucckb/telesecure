@@ -27,7 +27,10 @@ void window::paint()
    wbkgd(win, colorpair(m_fg,m_bg));
    do_draw_screen(*m_ctx);
    unsetcolor(win, m_fg,m_bg);
-   if(m_border) wnoutrefresh(m_ctx->winm());
+   if(m_border) {
+     wnoutrefresh(m_ctx->winm());
+    // wnoutrefresh(m_ctx->win());
+   }
    else wnoutrefresh(m_ctx->win());
 }
 

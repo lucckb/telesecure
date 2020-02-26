@@ -34,8 +34,6 @@ void input_manager::loop()
            m_switch_window_cb(ch-KEY_F(1));
            break;
         // Delete character
-        case KEY_BACKSPACE:
-        case KEY_DC:
         case 127:
             m_delete_char_cb();
             break;
@@ -45,7 +43,9 @@ void input_manager::loop()
             break;
         //Forward to the input box
         default: 
-            if(std::iswprint(ch)) m_add_char_cb(convert.to_bytes(ch));
+            if(std::iswprint(ch)) {
+                m_add_char_cb(convert.to_bytes(ch));
+            }
             break;
         }
     }
