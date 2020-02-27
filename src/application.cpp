@@ -10,6 +10,7 @@
 #include <gui/status_bar.hpp>
 #include <gui/chat_view.hpp>
 #include <gui/edit_box.hpp>
+#include <gui/chat_doc.hpp>
 #include <input/input_manager.hpp>
 
 
@@ -28,9 +29,11 @@ int main() {
 
     auto wnd2 = chat_view::clone(color_t::yellow,color_t::black);
     wm.add_window(wnd2);
+    auto wind2v = chat_doc::clone();
+    wnd2->set_view(wind2v);
     //Testing lines only
     for( int i=0;i<200;++i) {
-      wnd2->add_line( "Jaco", std::string("Linia testowa numer ") + std::to_string(i+1));
+      wind2v->add_line( "Jaco", std::string("Linia testowa numer ") + std::to_string(i+1));
     }
     auto wnd3 = edit_box::clone(color_t::red,color_t::black);
     wm.add_window(wnd3);
