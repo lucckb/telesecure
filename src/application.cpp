@@ -15,7 +15,6 @@
 
 
 int main() { 
-    
     using namespace gui;
     using namespace input;
     auto& wm = window_manager::get();

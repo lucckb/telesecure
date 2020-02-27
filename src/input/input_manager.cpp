@@ -9,8 +9,13 @@ namespace {
     static constexpr auto CTRL(int ch) {
         return ch & 037;
     }
+    struct key {
+    enum key_ {
+        backspace = 127,
+        backspace2 = 263,
+        enter = 10
+    };};
 }
-
 
 namespace input 
 {
@@ -35,10 +40,10 @@ void input_manager::loop()
            m_switch_window_cb(ch-KEY_F(1));
            break;
         // Delete character
-        case 127:
+        case key::backspace:
             m_delete_char_cb();
             break;
-        case 263:
+        case key::backspace2:
             if(ret==KEY_CODE_YES) {
                 m_delete_char_cb();
             } else {
@@ -46,7 +51,7 @@ void input_manager::loop()
             }
             break;
         //Line completed
-        case 10:
+        case key::enter:
             m_line_completed_cb();
             break;
         //Forward to the input box
