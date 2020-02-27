@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <ncurses.h>
+#include <curses.h>
 
 
 namespace gui {

@@ -42,6 +42,12 @@ namespace {
         static constexpr auto i = 1 << 3;
         return (i & int(fg)); 
     }
+    bool is_leading_utf8_byte(char c) {
+        auto first_bit_set = (c & 0x80) != 0;
+        auto second_bit_set = (c & 0X40) != 0;
+         return !first_bit_set || second_bit_set;
+    
+    }
 }
 
 
@@ -68,6 +74,14 @@ void unsetcolor(WINDOW *wnd,color_t fg, color_t bg)
 int colorpair(color_t fg, color_t bg)
 {
     return COLOR_PAIR(_internal::colornum(fg,bg));
+}
+
+
+
+void pop_utf8(std::string& x) {
+    while (!is_leading_utf8_byte(x.back()))
+        x.pop_back();
+    x.pop_back();
 }
 
 }

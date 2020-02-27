@@ -1,6 +1,7 @@
 #pragma once
-#include <ncurses.h>
+#include <curses.h>
 #include <stdexcept>
+#include <string>
 
 namespace gui 
 {
@@ -29,6 +30,9 @@ namespace gui
     void unsetcolor(WINDOW* wnd, color_t fg, color_t bg);
     //! Get the color pair ID
     int colorpair(color_t fg, color_t bg);
+    //! Pop UTF8 from string
+    void pop_utf8(std::string& x);
+
 }
 
 

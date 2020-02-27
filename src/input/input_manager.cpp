@@ -28,7 +28,8 @@ void input_manager::loop()
             return;
         //Leave temporary
         case CTRL('p'):
-            m_leave_cb();    
+            m_leave_cb(); 
+            break;  
         // Switch data buffer
         case KEY_F(1)...KEY_F(10):
            m_switch_window_cb(ch-KEY_F(1));
@@ -37,13 +38,18 @@ void input_manager::loop()
         case 127:
             m_delete_char_cb();
             break;
+        case 263:
+            if(ret==KEY_CODE_YES) {
+                m_delete_char_cb();
+            }
+            break;
         //Line completed
         case 10:
             m_line_completed_cb();
             break;
         //Forward to the input box
         default: 
-            if(std::iswprint(ch)) {
+            if(std::iswprint(ch) && ret!=KEY_CODE_YES) {
                 m_add_char_cb(convert.to_bytes(ch));
             }
             break;

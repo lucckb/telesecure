@@ -9,12 +9,11 @@ namespace gui {
 edit_box::edit_box(color_t bg, color_t fg)
     : window(2,bg,fg,false)
 {
-
 }
+
 //! Destructor
 edit_box::~edit_box()
 {
-
 }
 
 //! Draw screen
@@ -52,7 +51,7 @@ void edit_box::del_char()
 {
     m_changed = true;
     m_delchar = true;
-    m_line.pop_back();
+    pop_utf8(m_line);
 }
 
 // Clear buffer 
