@@ -11,8 +11,8 @@ namespace input {
         }
         input_manager(input_manager&) = delete;
         input_manager& operator=(input_manager&) = delete;
-        static auto get() {
-            static std::shared_ptr<input_manager> obj( new input_manager);
+        static input_manager& get() {
+            static input_manager obj;
             return obj;
         } 
         //Register switch window callback

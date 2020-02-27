@@ -26,6 +26,7 @@ void status_bar::do_draw_screen(detail::window_driver_context& ctx)
 {
     auto win = ctx.win();
     wclear(win);
+    wprintw(win,"CMD");
     for( const auto& it : m_users ) {
         const auto& i = it.second;
         wprintw(win,"%s%c ", bar_name(i.username).c_str(),i.newmsg?'*':(i.online?'+':' '));

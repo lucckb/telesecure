@@ -12,8 +12,8 @@ namespace gui {
 
 class window_manager {
 public:
-    static auto get() {
-        static std::shared_ptr<window_manager> wnd(new window_manager);
+    static window_manager& get() {
+        static window_manager wnd;
         return wnd;
     } 
     //! Noncopyable 1
@@ -32,6 +32,16 @@ public:
     void resize_all();
     //! Create all windows according to the layout
     void create_all();
+    //Get window
+    template <typename T>
+       std::shared_ptr<T> win(int id) {
+           if(!m_winlist.at(id)) {
+               throw std::out_of_range("Window Null pointer exception");
+           }
+           auto ret = std::dynamic_pointer_cast<T>(m_winlist[id]);
+           if(!ret) throw::std::bad_cast();
+           return ret;
+       }
 private:
      //! Constructor
     window_manager( );

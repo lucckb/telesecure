@@ -77,6 +77,7 @@ void window_manager::repaint( )
 {
    wnoutrefresh(stdscr);
     for( auto wnd : m_winlist ) {
+        if(!wnd) std::logic_error("Null Window exception");
         wnd->paint();
     }
     doupdate();
@@ -99,7 +100,7 @@ void window_manager::init_signals()
             );
             }
             resizeterm(w.ws_row,w.ws_col);
-            get()->resize_all();
+            get().resize_all();
         } );
         a1.wait();
     };
