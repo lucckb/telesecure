@@ -1,7 +1,13 @@
+#include <exception>
+#include <cstdlib>
+#include <iostream>
+#include <curses.h>
+#include <app/tele_app.hpp>
+
+/*
 #include <iostream>
 #include <chrono>
 #include <thread>
-
 #include <td/telegram/Client.h>
 #include <td/telegram/td_api.h>
 #include <td/telegram/td_api.hpp>
@@ -12,9 +18,11 @@
 #include <gui/edit_box.hpp>
 #include <gui/chat_doc.hpp>
 #include <input/input_manager.hpp>
+*/
 
-
+#if 0
 int main() { 
+
     using namespace gui;
     using namespace input;
     auto& wm = window_manager::get();
@@ -59,4 +67,21 @@ int main() {
      
     });
     im.loop();
+}
+#endif
+
+int main() {
+
+    try {
+        app::tele_app the_app;
+        the_app.run();
+    } catch( const std::exception& ex )
+    {
+        clear();
+        printw("Software failure. Unhandled exception: %s\n", ex.what() );
+        printw("Press any key to exit..");
+        refresh();
+        getch();
+        return EXIT_FAILURE;   
+    }
 }

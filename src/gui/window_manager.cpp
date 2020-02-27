@@ -99,7 +99,7 @@ void window_manager::init_signals()
             );
             }
             resizeterm(w.ws_row,w.ws_col);
-            get().resize_all();
+            get()->resize_all();
         } );
         a1.wait();
     };

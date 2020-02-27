@@ -36,7 +36,7 @@ void input_manager::loop()
             m_leave_cb(); 
             break;  
         // Switch data buffer
-        case KEY_F(1)...KEY_F(10):
+        case KEY_F(1)...KEY_F(12):
            m_switch_window_cb(ch-KEY_F(1));
            break;
         // Delete character

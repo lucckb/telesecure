@@ -12,8 +12,8 @@ namespace gui {
 
 class window_manager {
 public:
-    static window_manager& get() {
-        static window_manager wnd;
+    static auto get() {
+        static std::shared_ptr<window_manager> wnd(new window_manager);
         return wnd;
     } 
     //! Noncopyable 1
