@@ -41,6 +41,8 @@ void input_manager::loop()
         case 263:
             if(ret==KEY_CODE_YES) {
                 m_delete_char_cb();
+            } else {
+                m_add_char_cb(convert.to_bytes(ch));
             }
             break;
         //Line completed
