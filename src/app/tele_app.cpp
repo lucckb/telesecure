@@ -5,6 +5,7 @@
 #include <gui/status_bar.hpp>
 #include <gui/chat_view.hpp>
 #include <gui/chat_doc.hpp>
+#include <readline/readline.h>
 
 namespace app {
 
@@ -35,30 +36,26 @@ void tele_app::init_input()
     auto& inp = input::input_manager::get(); 
     auto& win = gui::window_manager::get();
     inp.register_add_char([&](std::string_view ch) {
-        if(m_current_buffer==0) {
-            for( auto c : ch ) m_console.forwardToReadline(c);
-             win.win<gui::edit_box>(win_edit)->add_new_char(ch);
-        } else {
-            win.win<gui::edit_box>(win_edit)->add_new_char(ch);
-            win.repaint();
-        }
+     
+        win.win<gui::edit_box>(win_edit)->add_new_char(ch);
+        win.repaint();
     });
     inp.register_delete_char([&](){
-        if(m_current_buffer==0) {
-            win.win<gui::edit_box>(win_edit)->del_char();
-            m_console.forwardToReadline(127);
-            win.win<gui::edit_box>(win_edit)->del_char();
-        } else {
-            win.win<gui::edit_box>(win_edit)->del_char();
-            win.repaint();
-        }
+        win.win<gui::edit_box>(win_edit)->del_char();
+        win.repaint();
     });
     inp.register_line_completed(std::bind(&tele_app::on_line_completed,this));
     inp.register_switch_window(std::bind(&tele_app::on_switch_buffer,this,std::placeholders::_1));
+    inp.forward_to_readline(true);
     //Readline refresh added
     m_console.registerRedisplayCommand([&]() {
-        win.repaint();
+        win.win<gui::edit_box>(win_edit)->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
     });
+    //Readline callback bind function
+    inp.register_readline_callback(
+        std::bind(&CppReadline::Console::forwardToReadline,
+        std::ref(m_console),std::placeholders::_1)
+    );
 }
 
 // Run main handler
@@ -76,15 +73,9 @@ void tele_app::run()
  //Callback when input data completed
 void tele_app::on_line_completed( )
 {
-    if(m_current_buffer==0) {
-        m_console.forwardToReadline('\n');
-        auto& win = gui::window_manager::get();
-        win.win<gui::edit_box>(win_edit)->clear();
-    } else {
-        auto& win = gui::window_manager::get();
-        win.win<gui::edit_box>(win_edit)->clear();
-        win.repaint();
-    }
+    auto& win = gui::window_manager::get();
+    win.win<gui::edit_box>(win_edit)->clear();
+    win.repaint();
 }
 // On switch buffer
 void tele_app::on_switch_buffer(int num)
@@ -93,6 +84,7 @@ void tele_app::on_switch_buffer(int num)
     if(m_chats[num]) {
        win.win<gui::status_bar>(win_status)->set_active(m_chats[num]->id());
        m_current_buffer = num;
+       input::input_manager::get().forward_to_readline(m_current_buffer==0); 
     }
 }
 

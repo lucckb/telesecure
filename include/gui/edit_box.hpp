@@ -23,6 +23,8 @@ namespace gui {
         void del_char();
         // Clear buffer 
         void clear();
+        //Special function in readline mode
+        void on_readline_handle(const char* prompt, const char* linebuf, int point);
     private:
         std::string m_char {};
         bool m_changed {};

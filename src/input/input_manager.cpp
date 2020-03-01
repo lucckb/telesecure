@@ -41,23 +41,30 @@ void input_manager::loop()
            break;
         // Delete character
         case key::backspace:
-            m_delete_char_cb();
+            if(m_forward_readline) m_readline_cb(convert.to_bytes(ch));
+            else m_delete_char_cb();
             break;
         case key::backspace2:
             if(ret==KEY_CODE_YES) {
-                m_delete_char_cb();
+                if(m_forward_readline) m_readline_cb(convert.to_bytes(127));
+                else m_delete_char_cb();
             } else {
-                m_add_char_cb(convert.to_bytes(ch));
+                if(m_forward_readline) m_readline_cb(convert.to_bytes(ch));
+                else m_add_char_cb(convert.to_bytes(ch));
             }
             break;
         //Line completed
         case key::enter:
-            m_line_completed_cb();
+            if(m_forward_readline) m_readline_cb(convert.to_bytes(ch));
+            else m_line_completed_cb();
             break;
         //Forward to the input box
         default: 
-            if(std::iswprint(ch) && ret!=KEY_CODE_YES) {
-                m_add_char_cb(convert.to_bytes(ch));
+            if(m_forward_readline) m_readline_cb(convert.to_bytes(ch));
+            else {
+                if(std::iswprint(ch) && ret!=KEY_CODE_YES) {
+                    m_add_char_cb(convert.to_bytes(ch));
+                }
             }
             break;
         }

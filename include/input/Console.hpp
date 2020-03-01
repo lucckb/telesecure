@@ -116,7 +116,7 @@ namespace CppReadline {
             /** 
              * @brief Forward character to readline
              */
-            void forwardToReadline(int chr);
+            void forwardToReadline(std::string_view chr);
 
         private:
             Console(const Console&) = delete;

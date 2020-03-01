@@ -53,6 +53,10 @@ namespace gui {
         auto bgcolor() const noexcept {
             return m_bg;
         }
+        //Get context
+        auto& ctx() {
+            return *m_ctx;
+        } 
     private:
         color_t m_fg {};    //! Foreground color
         color_t m_bg {};    //! Background color

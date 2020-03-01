@@ -172,7 +172,7 @@ namespace CppReadline {
             return static_cast<int>((it->second)(inputs));
         }
 
-        std::cout << "Command '" << inputs[0] << "' not found.\n";
+        //std::cout << "Command '" << inputs[0] << "' not found.\n";
         return ReturnCode::Error;
     }
 
@@ -247,10 +247,12 @@ namespace CppReadline {
         currentConsole->pimpl_->redisplay = redisp;
     }
 
-    void Console::forwardToReadline(int chr)
+    void Console::forwardToReadline(std::string_view str)
     {
-        currentConsole->pimpl_->character = chr;
-        currentConsole->pimpl_->input_avail = true;
-        rl_callback_read_char();
+        for( auto chr: str ) {
+            currentConsole->pimpl_->character = chr;
+            currentConsole->pimpl_->input_avail = true;
+            rl_callback_read_char();
+        }
     }
 }

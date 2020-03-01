@@ -35,6 +35,14 @@ namespace input {
         void register_leave_session( std::function<void()> cb ) {
             m_leave_cb = cb;
         }
+        //Enable forwarding to the readline
+        void forward_to_readline(bool enable ) noexcept {
+            m_forward_readline = enable;
+        }
+        //Register readline callback
+        void register_readline_callback( std::function<void(std::string_view)> cb ) {
+            m_readline_cb = cb;
+        }
         //Handle input loop
         void loop();
     private:
@@ -43,5 +51,7 @@ namespace input {
         std::function<void(std::string_view)> m_add_char_cb;
         std::function<void()> m_line_completed_cb;
         std::function<void()> m_leave_cb;
+        std::function<void(std::string_view)> m_readline_cb;
+        bool m_forward_readline {};
     };
 }
