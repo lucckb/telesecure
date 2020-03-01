@@ -35,16 +35,30 @@ void tele_app::init_input()
     auto& inp = input::input_manager::get(); 
     auto& win = gui::window_manager::get();
     inp.register_add_char([&](std::string_view ch) {
-        if(m_current_buffer==0) for( auto c : ch ) m_console.forwardToReadline(c);
-        win.win<gui::edit_box>(win_edit)->add_new_char(ch);
-        win.repaint();
+        if(m_current_buffer==0) {
+            for( auto c : ch ) m_console.forwardToReadline(c);
+             win.win<gui::edit_box>(win_edit)->add_new_char(ch);
+        } else {
+            win.win<gui::edit_box>(win_edit)->add_new_char(ch);
+            win.repaint();
+        }
     });
     inp.register_delete_char([&](){
-        win.win<gui::edit_box>(win_edit)->del_char();
-        win.repaint();
+        if(m_current_buffer==0) {
+            win.win<gui::edit_box>(win_edit)->del_char();
+            m_console.forwardToReadline(127);
+            win.win<gui::edit_box>(win_edit)->del_char();
+        } else {
+            win.win<gui::edit_box>(win_edit)->del_char();
+            win.repaint();
+        }
     });
     inp.register_line_completed(std::bind(&tele_app::on_line_completed,this));
     inp.register_switch_window(std::bind(&tele_app::on_switch_buffer,this,std::placeholders::_1));
+    //Readline refresh added
+    m_console.registerRedisplayCommand([&]() {
+        win.repaint();
+    });
 }
 
 // Run main handler
@@ -62,9 +76,15 @@ void tele_app::run()
  //Callback when input data completed
 void tele_app::on_line_completed( )
 {
-    auto& win = gui::window_manager::get();
-    win.win<gui::edit_box>(win_edit)->clear();
-    win.repaint();
+    if(m_current_buffer==0) {
+        m_console.forwardToReadline('\n');
+        auto& win = gui::window_manager::get();
+        win.win<gui::edit_box>(win_edit)->clear();
+    } else {
+        auto& win = gui::window_manager::get();
+        win.win<gui::edit_box>(win_edit)->clear();
+        win.repaint();
+    }
 }
 // On switch buffer
 void tele_app::on_switch_buffer(int num)
