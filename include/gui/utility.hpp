@@ -10,7 +10,20 @@ namespace gui
         black, blue, green, cyan,
         red, magenta, yellow, white
     };
+    enum class attrib_t {
+        none,
+        bold = 1U << 0U,
+        underline = 1U << 1U
+    };
 
+    constexpr inline int operator&(  attrib_t a1, attrib_t a2 )
+    {
+        return int(a1) & int(a2);
+    }
+    constexpr inline attrib_t operator|(  attrib_t a1, attrib_t a2 )
+    {
+        return attrib_t(int(a1) | int(a2));
+    }
     struct rect {
         rect() {}
         int x {}, y {};
@@ -25,11 +38,13 @@ namespace gui
     }
 
     //! Set font to specific color
-    void setcolor(WINDOW* wnd, color_t fg, color_t bg);
+    void setcolor(WINDOW* wnd, color_t fg, color_t bg, attrib_t attributes=attrib_t::none);
     //! Unset font from specific color
     void unsetcolor(WINDOW* wnd, color_t fg, color_t bg);
     //! Get the color pair ID
     int colorpair(color_t fg, color_t bg);
+    //Unset attributes
+    void unsetattributes(WINDOW *wnd);
     //! Pop UTF8 from string
     void pop_utf8(std::string& x);
 

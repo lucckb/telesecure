@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <array>
+#include <input/Console.hpp>
 
 namespace gui {
     class window_manager;
@@ -32,7 +33,11 @@ namespace app {
         void init_input();
         //Callback when input data completed
         void on_line_completed( );
+        // On switch buffer
+        void on_switch_buffer(int window);
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
+        int m_current_buffer {};
+        CppReadline::Console m_console {">"};
     };
 }

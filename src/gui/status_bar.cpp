@@ -1,5 +1,6 @@
 #include <gui/status_bar.hpp>
 #include <gui/window_driver_context.hpp>
+#include <gui/utility.hpp>
 
 namespace gui {
 
@@ -26,10 +27,11 @@ void status_bar::do_draw_screen(detail::window_driver_context& ctx)
 {
     auto win = ctx.win();
     wclear(win);
-    wprintw(win,"CMD");
     for( const auto& it : m_users ) {
         const auto& i = it.second;
+        if(m_active==it.first) setcolor(win,fgcolor(),color_t::red, attrib_t::underline);
         wprintw(win,"%s%c ", bar_name(i.username).c_str(),i.newmsg?'*':(i.online?'+':' '));
+        if(m_active==it.first) unsetattributes(win);
     }
 }
 
@@ -63,6 +65,12 @@ void status_bar::set_newmsg( id_t id, bool newmsg )
     if( it != m_users.end() ) {
         it->second.newmsg = newmsg;
     }
+}
+
+//Set status active
+void status_bar::set_active( id_t id )
+{
+    m_active = id;
 }
 
 }

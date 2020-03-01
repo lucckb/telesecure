@@ -45,6 +45,14 @@ namespace gui {
         virtual void on_create(detail::window_driver_context& ctx) {
         
         }
+        //Get foreground color
+        auto fgcolor() const noexcept {
+            return m_fg;
+        }
+        //Get foreground color
+        auto bgcolor() const noexcept {
+            return m_bg;
+        }
     private:
         color_t m_fg {};    //! Foreground color
         color_t m_bg {};    //! Background color

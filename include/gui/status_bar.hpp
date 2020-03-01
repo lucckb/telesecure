@@ -2,6 +2,7 @@
 #include "window.hpp"
 #include <string>
 #include <map>
+#include <input/Console.hpp>
 
 namespace gui {
     class status_bar final: public window 
@@ -36,10 +37,13 @@ namespace gui {
         void set_online( id_t id, bool online );
         //New msg received
         void set_newmsg( id_t id, bool newmsg );
+        //Set status active
+        void set_active( id_t id );
     protected:
         // Do draw screen function
         void do_draw_screen( detail::window_driver_context& ctx ) override;
     private:
         std::map<id_t,item> m_users;
+        id_t m_active {};
     };
 }

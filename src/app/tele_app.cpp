@@ -24,7 +24,9 @@ void tele_app::init_gui()
    auto edit = gui::edit_box::clone(gui::color_t::blue, gui::color_t::white);
    win.add_window(edit);
    //Create first chat only
-   m_chats[0] = gui::chat_doc::clone(); 
+   m_chats[0] = gui::chat_doc::clone(0,"cmd>"); 
+   //Add bar user
+   bar->add_user(0,"C M");
 }
 
 // Initialize input box
@@ -33,6 +35,7 @@ void tele_app::init_input()
     auto& inp = input::input_manager::get(); 
     auto& win = gui::window_manager::get();
     inp.register_add_char([&](std::string_view ch) {
+        if(m_current_buffer==0) for( auto c : ch ) m_console.forwardToReadline(c);
         win.win<gui::edit_box>(win_edit)->add_new_char(ch);
         win.repaint();
     });
@@ -40,7 +43,8 @@ void tele_app::init_input()
         win.win<gui::edit_box>(win_edit)->del_char();
         win.repaint();
     });
-    inp.register_line_completed( std::bind(&tele_app::on_line_completed,this));
+    inp.register_line_completed(std::bind(&tele_app::on_line_completed,this));
+    inp.register_switch_window(std::bind(&tele_app::on_switch_buffer,this,std::placeholders::_1));
 }
 
 // Run main handler
@@ -61,6 +65,15 @@ void tele_app::on_line_completed( )
     auto& win = gui::window_manager::get();
     win.win<gui::edit_box>(win_edit)->clear();
     win.repaint();
+}
+// On switch buffer
+void tele_app::on_switch_buffer(int num)
+{
+    auto& win = gui::window_manager::get();
+    if(m_chats[num]) {
+       win.win<gui::status_bar>(win_status)->set_active(m_chats[num]->id());
+       m_current_buffer = num;
+    }
 }
 
 }

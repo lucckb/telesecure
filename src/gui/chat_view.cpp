@@ -33,7 +33,7 @@ void chat_view::do_draw_screen( detail::window_driver_context& ctx )
         const auto items = m_view->items();
         getmaxyx(win,maxy,maxx); maxy--;
         for (auto i = items.rbegin(); i != items.rend(); ++i,--maxy) {
-           mvwprintw(win,maxy,0,"%s@%s> %s\n",i->who.c_str(),time2str(i->time).c_str(),i->line.c_str());
+           mvwprintw(win,maxy,0,"%s@%s> %s\n",m_view->who().c_str(),time2str(i->time).c_str(),i->line.c_str());
            if(maxy<=0 ) break;
       }
     }

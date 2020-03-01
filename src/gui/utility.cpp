@@ -50,17 +50,15 @@ namespace {
     }
 }
 
-
-
-void setcolor(WINDOW *wnd, color_t fg, color_t bg)
+//Set color
+void setcolor(WINDOW *wnd, color_t fg, color_t bg, attrib_t attributes)
 {
     /* set the color pair (colornum) and bold/bright (A_BOLD) */
     wattron(wnd,COLOR_PAIR(_internal::colornum(fg, bg)));
-    if (is_bold(fg)) {
-        wattron(wnd,A_BOLD);
-    }
+    if(attributes&attrib_t::bold) wattron(wnd,A_BOLD);
+    if(attributes&attrib_t::underline) wattron(wnd,A_UNDERLINE);
 }
-
+//Unset color
 void unsetcolor(WINDOW *wnd,color_t fg, color_t bg)
 {
 /* unset the color pair (colornum) and
@@ -69,6 +67,13 @@ void unsetcolor(WINDOW *wnd,color_t fg, color_t bg)
     if (is_bold(fg)) {
         wattroff(wnd,A_BOLD);
     }
+}
+
+//Unset attributes
+void unsetattributes(WINDOW *wnd)
+{
+    wattroff(wnd, A_BOLD);
+    wattroff(wnd,A_UNDERLINE);
 }
 
 int colorpair(color_t fg, color_t bg)
