@@ -23,21 +23,22 @@ namespace input
 //Handle input loop
 void input_manager::loop()
 {
-    for(;;)
+    for(bool exitcode;;)
     {
-        if(m_forward_readline) readline_mode();
-        else normal_mode();
+        if(m_forward_readline) exitcode = readline_mode();
+        else exitcode = normal_mode();
+        if(exitcode) break;
     }
 }
 
 //Readline mode handle
-void input_manager::readline_mode()
+bool input_manager::readline_mode()
 {
     const auto ch = getch();
     switch(ch) {
         // Leave mode
         case CTRL('c'): 
-            return;
+            return true;
         //Leave temporary
         case CTRL('p'):
             m_leave_cb(); 
@@ -49,10 +50,11 @@ void input_manager::readline_mode()
         default:
             // Forward to readline
             m_readline_cb(ch);
-    } 
+    }
+    return false;
 }
 //Normal mode handle
-void input_manager::normal_mode()
+bool input_manager::normal_mode()
 {
     wint_t ch;
     std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert;
@@ -61,7 +63,7 @@ void input_manager::normal_mode()
     {
         // Leave mode
         case CTRL('c'): 
-            return;
+            return true;
         //Leave temporary
         case CTRL('p'):
             m_leave_cb(); 
@@ -92,6 +94,7 @@ void input_manager::normal_mode()
             }
             break;
     }
+    return false;
 }
 
 

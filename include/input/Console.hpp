@@ -120,7 +120,7 @@ namespace CppReadline {
             /** 
              * @brief Forward character to readline
              */
-            void forwardToReadline(int chr);
+            void forwardToReadline(char chr);
 
         private:
             Console(const Console&) = delete;

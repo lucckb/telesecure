@@ -241,7 +241,7 @@ namespace CppReadline {
         currentConsole->pimpl_->command_completted = cmdcpl;
     }
 
-    void Console::forwardToReadline(int chr)
+    void Console::forwardToReadline(char chr)
     {
         currentConsole->pimpl_->character = chr;
         currentConsole->pimpl_->input_avail = true;

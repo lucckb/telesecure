@@ -35,6 +35,7 @@ void tele_app::init_input()
 {
     auto& inp = input::input_manager::get(); 
     auto& win = gui::window_manager::get();
+    m_console = std::make_unique<CppReadline::Console>(">");
     inp.register_add_char([&](std::string_view ch) {
      
         win.win<gui::edit_box>(win_edit)->add_new_char(ch);
@@ -48,7 +49,7 @@ void tele_app::init_input()
     inp.register_switch_window(std::bind(&tele_app::on_switch_buffer,this,std::placeholders::_1));
     inp.forward_to_readline(true);
     //Readline refresh added
-    m_console.registerRedisplayCommand([&]() {
+    m_console->registerRedisplayCommand([&]() {
         win.win<gui::edit_box>(win_edit)->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
     });
     //Readline callback bind function
@@ -56,7 +57,7 @@ void tele_app::init_input()
         std::bind(&CppReadline::Console::forwardToReadline,
         std::ref(m_console),std::placeholders::_1)
     );
-    m_console.registerCommandCompleted(
+    m_console->registerCommandCompleted(
         std::bind(&tele_app::on_readline_completed, this, std::placeholders::_1)
     );
 }

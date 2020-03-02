@@ -40,6 +40,6 @@ namespace app {
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         int m_current_buffer {};
-        CppReadline::Console m_console {">"};
+        std::unique_ptr<CppReadline::Console> m_console;
     };
 }
