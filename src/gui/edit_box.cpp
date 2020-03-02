@@ -3,6 +3,7 @@
 #include <functional>
 #include <wchar.h>
 #include <wctype.h>
+#include <cstring>
 
 namespace gui {
 

@@ -29,7 +29,7 @@ void input_manager::loop()
         const auto ret = get_wch(&ch);
         switch(ch) {
         // Leave mode
-        case CTRL('q'): 
+        case CTRL('c'): 
             return;
         //Leave temporary
         case CTRL('p'):

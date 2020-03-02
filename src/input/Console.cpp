@@ -31,6 +31,7 @@ namespace CppReadline {
         bool input_avail = false;
         int character;
         std::function<void()> redisplay;
+        std::function<void(int)> command_completted;
 
         Impl(::std::string const& greeting) : greeting_(greeting), commands_() {}
         ~Impl() {
@@ -82,26 +83,17 @@ namespace CppReadline {
                 if ( buffer[0] != '\0' ) add_history(buffer);
                 std::string line(buffer);
                 free(buffer);
-                currentConsole->executeCommand(line);
+                if(currentConsole->pimpl_->command_completted)
+                    currentConsole->pimpl_->command_completted(
+                        currentConsole->executeCommand(line)
+                    );
             }
         );
         // Extra LB end
         // Init readline basics
         rl_attempted_completion_function = &Console::getCommandCompletions;
 
-        // These are default hardcoded commands.
-        // Help command lists available commands.
-        pimpl_->commands_["help"] = [this](const Arguments &){
-            auto commands = getRegisteredCommands();
-            std::cout << "Available commands are:\n";
-            for ( auto & command : commands ) std::cout << "\t" << command << "\n";
-            return ReturnCode::Ok;
-        };
-        // Run command executes all commands in an external file.
-        pimpl_->commands_["run"] =  [this](const Arguments & input) {
-            if ( input.size() < 2 ) { std::cout << "Usage: " << input[0] << " script_filename\n"; return 1; }
-            return executeFile(input[1]);
-        };
+  
         // Quit and Exit simply terminate the console.
         pimpl_->commands_["quit"] = [this](const Arguments &) {
             return ReturnCode::Quit;
@@ -172,14 +164,12 @@ namespace CppReadline {
             return static_cast<int>((it->second)(inputs));
         }
 
-        //std::cout << "Command '" << inputs[0] << "' not found.\n";
         return ReturnCode::Error;
     }
 
     int Console::executeFile(const std::string & filename) {
         std::ifstream input(filename);
         if ( ! input ) {
-            std::cout << "Could not find the specified file to execute.\n";
             return ReturnCode::Error;
         }
         std::string command;
@@ -187,10 +177,8 @@ namespace CppReadline {
 
         while ( std::getline(input, command)  ) {
             if ( command[0] == '#' ) continue; // Ignore comments
-            // Report what the Console is executing.
-            std::cout << "[" << counter << "] " << command << '\n';
-            if ( (result = executeCommand(command)) ) return result;
-            ++counter; std::cout << '\n';
+            // Report what the Console is executing. 
+            if ( (result = executeCommand(command)) ) return result; 
         }
 
         // If we arrived successfully at the end, all is ok
@@ -245,6 +233,11 @@ namespace CppReadline {
     void Console::registerRedisplayCommand(std::function<void()> redisp )
     {
         currentConsole->pimpl_->redisplay = redisp;
+    }
+
+    void Console::registerCommandCompleted( std::function<void(int)> cmdcpl )
+    {
+        currentConsole->pimpl_->command_completted = cmdcpl;
     }
 
     void Console::forwardToReadline(std::string_view str)

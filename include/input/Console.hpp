@@ -111,7 +111,11 @@ namespace CppReadline {
             /** 
              * @brief This function register redisplay handler
              */
-            void registerRedisplayCommand(std::function<void()> redisp );
+            void registerRedisplayCommand( std::function<void()> redisp );
+
+            /** @brief Redisplay command completed command 
+             */
+            void registerCommandCompleted( std::function<void(int)> cmdcpl );
 
             /** 
              * @brief Forward character to readline

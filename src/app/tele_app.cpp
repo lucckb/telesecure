@@ -56,6 +56,9 @@ void tele_app::init_input()
         std::bind(&CppReadline::Console::forwardToReadline,
         std::ref(m_console),std::placeholders::_1)
     );
+    m_console.registerCommandCompleted(
+        std::bind(&tele_app::on_readline_completed, this, std::placeholders::_1)
+    );
 }
 
 // Run main handler
@@ -67,6 +70,8 @@ void tele_app::run()
     auto& win = gui::window_manager::get();
     win.create_all();
     win.repaint();
+    win.win<gui::edit_box>(win_edit)->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
+    win.win<gui::chat_view>(win_view)->set_view(m_chats[0]);
     inp.loop();
 }
 
@@ -77,15 +82,32 @@ void tele_app::on_line_completed( )
     win.win<gui::edit_box>(win_edit)->clear();
     win.repaint();
 }
+
 // On switch buffer
 void tele_app::on_switch_buffer(int num)
 {
     auto& win = gui::window_manager::get();
     if(m_chats[num]) {
        win.win<gui::status_bar>(win_status)->set_active(m_chats[num]->id());
+       input::input_manager::get().forward_to_readline(num==0); 
+       //Assig buffer to chat view 
+       if(num!=m_current_buffer) {
+           auto chat =  win.win<gui::chat_view>(win_view);
+           chat->set_view(m_chats[num]);
+           //TODO: Redraw
+       }
        m_current_buffer = num;
-       input::input_manager::get().forward_to_readline(m_current_buffer==0); 
     }
+}
+
+//! When readline parser complete commmand
+void tele_app::on_readline_completed(int code)
+{
+    auto& win = gui::window_manager::get();
+    if(code != CppReadline::Console::Ok) {
+        m_chats[0]->add_line("Command not found");
+    }
+    win.repaint();
 }
 
 }

@@ -96,7 +96,7 @@
                 "engineLogging": false,
                 "traceResponse": false
         },
-        //"terminal" : "external",
+        "terminal" : "external",
         "env": {
             "TERM" : "xterm-256color"
         },
