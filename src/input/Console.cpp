@@ -80,6 +80,7 @@ namespace CppReadline {
         rl_callback_handler_install(
             pimpl_->greeting_.c_str(),
             [](char* buffer) {
+                if(!buffer) return;
                 if ( buffer[0] != '\0' ) add_history(buffer);
                 std::string line(buffer);
                 free(buffer);
@@ -240,12 +241,10 @@ namespace CppReadline {
         currentConsole->pimpl_->command_completted = cmdcpl;
     }
 
-    void Console::forwardToReadline(std::string_view str)
+    void Console::forwardToReadline(int chr)
     {
-        for( auto chr: str ) {
-            currentConsole->pimpl_->character = chr;
-            currentConsole->pimpl_->input_avail = true;
-            rl_callback_read_char();
-        }
+        currentConsole->pimpl_->character = chr;
+        currentConsole->pimpl_->input_avail = true;
+        rl_callback_read_char();
     }
 }
