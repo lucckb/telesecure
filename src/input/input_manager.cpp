@@ -34,28 +34,6 @@ namespace {
         {0x5b, 0x32, 0x34, 0x7e} //12
     };
 
-
-    int read_multichars(char* buf, const size_t n)
-    {
-        nodelay(stdscr,TRUE);
-        int i;
-        for(i=0;i<n;++i) {
-            auto ch = getch();
-            if(ch==ERR) {
-                nodelay(stdscr,FALSE);
-                return i;
-            }
-            buf[i] = ch;
-        }
-        nodelay(stdscr,FALSE);
-        return i;
-    }
-    void back_multichars(const char* buf, const size_t n)
-    {
-        for(int i=0;i<n;++i) {
-            ungetch(buf[i]);
-        }
-    }
 }
 
 namespace input
@@ -98,7 +76,7 @@ bool input_manager::readline_mode()
                     return false;
                }
            }
-          ungetch(key::escape);
+          m_readline_cb(key::escape);
           back_multichars(buf,n);
         }
         break;
@@ -158,6 +136,30 @@ void input_manager::forward_to_readline(bool enable) noexcept {
     m_forward_readline = enable;
     //Keypad enabled only on nonreadline mode
     keypad(stdscr, m_forward_readline?FALSE:TRUE);	/* We get F1, F2 etc..		*/
+}
+
+
+int input_manager::read_multichars(char* buf, const size_t n)
+{
+    nodelay(stdscr,TRUE);
+    int i;
+    for(i=0;i<n;++i) {
+        auto ch = getch();
+        if(ch==ERR) {
+            nodelay(stdscr,FALSE);
+            return i;
+        }
+        buf[i] = ch;
+    }
+    nodelay(stdscr,FALSE);
+    return i;
+}
+
+void input_manager::back_multichars(const char* buf, const size_t n)
+{
+    for(int i=0;i<n;++i) {
+        m_readline_cb(buf[i]);
+    }
 }
 
 }

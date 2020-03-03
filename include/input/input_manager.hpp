@@ -48,6 +48,8 @@ namespace input {
         bool readline_mode();
         //Normal mode handle
         bool normal_mode();
+        void back_multichars(const char* buf, const size_t n);
+        int read_multichars(char* buf, const size_t n);
     private:
         std::function<void(int)> m_switch_window_cb;
         std::function<void()> m_delete_char_cb;
