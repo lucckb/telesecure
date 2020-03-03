@@ -3,18 +3,59 @@
 #include <curses.h>
 #include <locale>
 #include <codecvt>
+#include <cstring>
 
 
 namespace {
-    static constexpr auto CTRL(int ch) {
+    constexpr auto CTRL(int ch) {
         return ch & 037;
     }
     struct key {
     enum key_ {
         backspace = 127,
         backspace2 = 263,
-        enter = 10
+        enter = 10,
+        escape = 27
     };};
+
+    constexpr auto keytab_sz = 12;
+    constexpr char keytab[12][4] = {
+        {0x4f, 0x50, 0, 0}, //1
+        {0x4f, 0x51, 0, 0}, //2
+        {0x4f, 0x52, 0, 0}, //3
+        {0x4f, 0x53, 0, 0}, //4
+        {0x5b, 0x31, 0x35, 0x7e}, //5
+        {0x5b, 0x31, 0x37, 0x7e}, //6
+        {0x5b, 0x31, 0x38, 0x7e}, //7
+        {0x5b, 0x31, 0x39, 0x7e}, //8
+        {0x5b, 0x32, 0x30, 0x7e}, //9
+        {0x5b, 0x32, 0x31, 0x7e}, //10
+        {0x5b, 0x32, 0x32, 0x7e}, //11
+        {0x5b, 0x32, 0x34, 0x7e} //12
+    };
+
+
+    int read_multichars(char* buf, const size_t n)
+    {
+        nodelay(stdscr,TRUE);
+        int i;
+        for(i=0;i<n;++i) {
+            auto ch = getch();
+            if(ch==ERR) {
+                nodelay(stdscr,FALSE);
+                return i;
+            }
+            buf[i] = ch;
+        }
+        nodelay(stdscr,FALSE);
+        return i;
+    }
+    void back_multichars(const char* buf, const size_t n)
+    {
+        for(int i=0;i<n;++i) {
+            ungetch(buf[i]);
+        }
+    }
 }
 
 namespace input
@@ -34,7 +75,7 @@ void input_manager::loop()
 //Readline mode handle
 bool input_manager::readline_mode()
 {
-    const auto ch = getch();
+    auto ch = getch();
     switch(ch) {
         // Leave mode
         case CTRL('c'): 
@@ -47,6 +88,20 @@ bool input_manager::readline_mode()
         case KEY_F(1)...KEY_F(12):
            m_switch_window_cb(ch-KEY_F(1));
            break;
+        //Handle fn keypad manually
+        case key::escape: {
+           char buf[16];
+           const auto n = read_multichars(buf,sizeof buf);
+           for(int i=0;i<keytab_sz;i++) {
+               if(!memcmp(keytab[i],buf,n)) {
+                    m_switch_window_cb(i);
+                    return false;
+               }
+           }
+          ungetch(key::escape);
+          back_multichars(buf,n);
+        }
+        break;
         default:
             // Forward to readline
             m_readline_cb(ch);
@@ -101,8 +156,8 @@ bool input_manager::normal_mode()
  //Enable forwarding to the readline
 void input_manager::forward_to_readline(bool enable) noexcept {
     m_forward_readline = enable;
+    //Keypad enabled only on nonreadline mode
     keypad(stdscr, m_forward_readline?FALSE:TRUE);	/* We get F1, F2 etc..		*/
-    meta(stdscr, m_forward_readline?FALSE:TRUE);     /* Enable meta */
 }
 
 }
