@@ -67,6 +67,7 @@ void tele_app::run()
 {
     init_gui();
     init_input();
+    register_commands();
     auto& inp = input::input_manager::get(); 
     auto& win = gui::window_manager::get();
     win.create_all();
@@ -109,6 +110,22 @@ void tele_app::on_readline_completed(int code)
         m_chats[0]->add_line("Command not found");
     }
     win.repaint();
+}
+
+// Register commands
+void  tele_app::register_commands()
+{
+    //Handle small help commands
+    m_console->registerCommand( 
+        "help", [&](const CppReadline::Console::Arguments&) {
+            auto& win = gui::window_manager::get();
+            auto view =  win.win<gui::chat_view>(win_view);
+            m_chats[0]->add_line("Available commands are:");
+            for(auto& cmd : m_console->getRegisteredCommands()) {
+                m_chats[0]->add_line("\t " + cmd);
+            }
+            return 0;
+    });
 }
 
 }

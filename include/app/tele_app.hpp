@@ -29,8 +29,12 @@ namespace app {
         tele_app();
         void run();
     private:
+        //Initialize GUI
         void init_gui();
+        //Initialize input
         void init_input();
+        //Register commands
+        void register_commands();
         //Callback when input data completed
         void on_line_completed( );
         // On switch buffer
