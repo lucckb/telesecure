@@ -6,12 +6,20 @@
 #include <gui/chat_view.hpp>
 #include <gui/chat_doc.hpp>
 #include <readline/readline.h>
+#include <app/telegram_cli.hpp>
 
 namespace app {
 
 // Constructor
 tele_app::tele_app()
+    : m_tcli(new telegram_cli(*this))
 {
+}
+
+//Destructor
+tele_app::~tele_app()
+{
+
 }
 
 //Initialize gui
@@ -25,7 +33,7 @@ void tele_app::init_gui()
    auto edit = gui::edit_box::clone(gui::color_t::blue, gui::color_t::white);
    win.add_window(edit);
    //Create first chat only
-   m_chats[0] = gui::chat_doc::clone(0,"cmd>"); 
+   m_chats[0] = gui::chat_doc::clone(0,"cmd"); 
    //Add bar user
    bar->add_user(0,"C M");
 }
@@ -37,11 +45,12 @@ void tele_app::init_input()
     auto& win = gui::window_manager::get();
     m_console = std::make_unique<CppReadline::Console>(">");
     inp.register_add_char([&](std::string_view ch) {
-     
+        std::unique_lock _lck(m_mtx);
         win.win<gui::edit_box>(win_edit)->add_new_char(ch);
         win.repaint();
     });
     inp.register_delete_char([&](){
+        std::unique_lock _lck(m_mtx);
         win.win<gui::edit_box>(win_edit)->del_char();
         win.repaint();
     });
@@ -50,6 +59,7 @@ void tele_app::init_input()
     inp.forward_to_readline(true);
     //Readline refresh added
     m_console->registerRedisplayCommand([&]() {
+        std::unique_lock _lck(m_mtx);
         win.win<gui::edit_box>(win_edit)->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
     });
     //Readline callback bind function
@@ -74,12 +84,16 @@ void tele_app::run()
     win.repaint();
     win.win<gui::edit_box>(win_edit)->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
     win.win<gui::chat_view>(win_view)->set_view(m_chats[0]);
+    m_tcli->start();
     inp.loop();
+    m_tcli->stop();
+    m_tcli->wait_for_terminate();
 }
 
  //Callback when input data completed
 void tele_app::on_line_completed( )
 {
+    std::unique_lock _lck(m_mtx);
     auto& win = gui::window_manager::get();
     win.win<gui::edit_box>(win_edit)->clear();
     win.repaint();
@@ -88,6 +102,7 @@ void tele_app::on_line_completed( )
 // On switch buffer
 void tele_app::on_switch_buffer(int num)
 {
+    std::unique_lock _lck(m_mtx);
     auto& win = gui::window_manager::get();
     if(m_chats[num]) {
        win.win<gui::status_bar>(win_status)->set_active(m_chats[num]->id());
@@ -105,6 +120,7 @@ void tele_app::on_switch_buffer(int num)
 //! When readline parser complete commmand
 void tele_app::on_readline_completed(int code)
 {
+    std::unique_lock _lck(m_mtx);
     auto& win = gui::window_manager::get();
     if(code != CppReadline::Console::Ok) {
         m_chats[0]->add_line("Command not found");
@@ -118,6 +134,7 @@ void  tele_app::register_commands()
     //Handle small help commands
     m_console->registerCommand( 
         "help", [&](const CppReadline::Console::Arguments&) {
+            std::unique_lock _lck(m_mtx);
             auto& win = gui::window_manager::get();
             auto view =  win.win<gui::chat_view>(win_view);
             m_chats[0]->add_line("Available commands are:");

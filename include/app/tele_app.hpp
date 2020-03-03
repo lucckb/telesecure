@@ -3,6 +3,7 @@
 #include <memory>
 #include <array>
 #include <input/Console.hpp>
+#include <shared_mutex>
 
 namespace gui {
     class window_manager;
@@ -14,7 +15,7 @@ namespace input {
 }
 
 namespace app {
-
+    class telegram_cli;
     // Core class application
     class tele_app {
         static constexpr auto num_chats = 12;
@@ -27,6 +28,7 @@ namespace app {
         tele_app(tele_app&) = delete;
         tele_app& operator=(tele_app&) = delete;
         tele_app();
+        ~tele_app();
         void run();
     private:
         //Initialize GUI
@@ -45,5 +47,7 @@ namespace app {
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         int m_current_buffer {};
         std::unique_ptr<CppReadline::Console> m_console;
+        const std::unique_ptr<telegram_cli> m_tcli;
+        std::shared_mutex m_mtx;
     };
 }

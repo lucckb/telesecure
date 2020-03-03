@@ -8,8 +8,10 @@ namespace gui {
 namespace {
        std::string time2str(std::time_t tim)
        {
+           char buf[32] {};
            auto tm = std::localtime(&tim);
-           return std::to_string(tm->tm_hour) + ":" + std::to_string(tm->tm_min);
+           std::snprintf(buf,sizeof buf,"%02i:%02i",tm->tm_hour,tm->tm_min);
+           return buf;
        }
 }
 

@@ -86,7 +86,15 @@
         "typeindex": "cpp",
         "__tree": "cpp",
         "future": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "filesystem": "cpp",
+        "cassert": "cpp",
+        "ccomplex": "cpp",
+        "cerrno": "cpp",
+        "climits": "cpp",
+        "ctgmath": "cpp",
+        "cstdbool": "cpp",
+        "shared_mutex": "cpp"
     },
     "cmake.debugConfig": {
         "stopAtEntry": true,
