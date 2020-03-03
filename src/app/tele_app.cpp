@@ -75,17 +75,24 @@ void tele_app::init_input()
 // Run main handler
 void tele_app::run()
 {
+    //Subsystem initialization
     init_gui();
     init_input();
     register_commands();
+
     auto& inp = input::input_manager::get(); 
     auto& win = gui::window_manager::get();
+    //Create windows
     win.create_all();
     win.repaint();
+    //Initial configuration
     win.win<gui::edit_box>(win_edit)->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
     win.win<gui::chat_view>(win_view)->set_view(m_chats[0]);
+    //Start telegram client
     m_tcli->start();
+    //Start input main loop
     inp.loop();
+    //Wait Stop the telegram client and wait for termination
     m_tcli->stop();
     m_tcli->wait_for_terminate();
 }
@@ -131,7 +138,7 @@ void tele_app::on_readline_completed(int code)
 // Register commands
 void  tele_app::register_commands()
 {
-    //Handle small help commands
+    //Handle help command on the terminal
     m_console->registerCommand( 
         "help", [&](const CppReadline::Console::Arguments&) {
             std::unique_lock _lck(m_mtx);
