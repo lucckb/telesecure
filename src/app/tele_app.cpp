@@ -136,7 +136,7 @@ void tele_app::on_readline_completed(int code)
 }
 
 // Register commands
-void  tele_app::register_commands()
+void tele_app::register_commands()
 {
     //Handle help command on the terminal
     m_console->registerCommand( 
@@ -150,6 +150,21 @@ void  tele_app::register_commands()
             }
             return 0;
     });
+}
+
+//When chat found
+std::shared_ptr<gui::chat_doc> tele_app::find_chat(id_t id) noexcept 
+{
+    for(auto ch : m_chats) if(ch->id()==id) return ch;
+    return m_chats[0];
+}
+
+//When new message from chat
+void tele_app::on_new_message(uint64_t id, std::string_view /*name*/, std::string_view msg)
+{
+    std::unique_lock _lck(m_mtx);
+    auto chat = find_chat(id);
+    chat->add_line(msg);
 }
 
 }

@@ -25,11 +25,15 @@ namespace app {
             win_edit
         };
     public:
+        //Constructor
         tele_app(tele_app&) = delete;
         tele_app& operator=(tele_app&) = delete;
         tele_app();
         ~tele_app();
+        //Main thread
         void run();
+        //When new message from chat
+        void on_new_message(uint64_t id, std::string_view name, std::string_view msg);
     private:
         //Initialize GUI
         void init_gui();
@@ -43,6 +47,8 @@ namespace app {
         void on_switch_buffer(int window);
         //! When readline parser complete commmand
         void on_readline_completed(int code);
+        //When chat found
+        std::shared_ptr<gui::chat_doc> find_chat(id_t id) noexcept;
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         int m_current_buffer {};

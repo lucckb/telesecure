@@ -71,6 +71,7 @@ void telegram_cli::client_thread()
         } else {
              auto response = m_client->receive(1);
             if (response.object) {
+                process_response(std::move(response));
             } else {
                 break;
             }
@@ -85,6 +86,7 @@ void telegram_cli::restart()
     m_client.reset();
     m_need_restart = false;
     m_are_authorized = false;
+    //TODO: Fill the reset object state variables
 }
 
 //Process response
@@ -129,8 +131,7 @@ void telegram_cli::process_response(td::Client::Response response)
                 {
                     text = static_cast<td_api::messageText &>(*update_new_message.message_->content_).text_->text_;
                 }
-                std::cout << "Got message: [chat_id:" << chat_id << "] [from:" << sender_user_name << "] ["
-                        << text << "]" << std::endl;
+                m_app.on_new_message(chat_id,sender_user_name,text);
             },
             [](auto &update) {}));
  }
