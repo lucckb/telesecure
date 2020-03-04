@@ -165,6 +165,9 @@ void tele_app::on_new_message(uint64_t id, std::string_view /*name*/, std::strin
     std::unique_lock _lck(m_mtx);
     auto chat = find_chat(id);
     chat->add_line(msg);
+    auto& win = gui::window_manager::get();
+    auto status = win.win<gui::status_bar>(win_status);
+    status->set_newmsg(id,true);
 }
 
 }
