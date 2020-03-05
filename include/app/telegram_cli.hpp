@@ -13,6 +13,14 @@ namespace app {
     class telegram_cli 
     {
         using Object = td::td_api::object_ptr<td::td_api::Object>;
+        //Authentication query handler
+        auto create_authentication_query_handler() {
+            return [this, id = m_authentication_query_id](Object object) {
+                if(id == m_authentication_query_id) {
+                check_authentication_error(std::move(object));
+                }
+            };
+        }
     public:
         //Contructors
         telegram_cli(tele_app& app);
@@ -24,6 +32,31 @@ namespace app {
         void stop();
         //Wait for thread terminate
         void wait_for_terminate();
+        //Username message
+        void set_auth_user(std::string first_name, std::string last_name)
+        {
+             send_query(td::td_api::make_object<td::td_api::registerUser>(first_name, last_name),
+                create_authentication_query_handler());
+        }
+        //Set auth code
+        void set_auth_code( std::string code ) {
+            send_query(td::td_api::make_object<td::td_api::checkAuthenticationCode>(code),
+                    create_authentication_query_handler());
+        }
+        //Set auth passwoord
+        void set_auth_password( std::string authpass )
+        {
+            send_query(td::td_api::make_object<td::td_api::checkAuthenticationPassword>(authpass),
+                create_authentication_query_handler());
+        }
+        //Set phone number
+        void set_phone_number( std::string phoneno )
+        {
+            send_query(td::td_api::make_object<td::td_api::setAuthenticationPhoneNumber>(phoneno, nullptr),
+                create_authentication_query_handler());
+        }
+        //Set encryption key
+        void set_enckey( std::string key );
     private:
         //Telegram main client thread
         void client_thread();
@@ -37,14 +70,6 @@ namespace app {
         void on_authorization_state_update();
         //On send query
         void send_query(td::td_api::object_ptr<td::td_api::Function> f, std::function<void(Object)> handler);
-        //Authentication query handler
-        auto create_authentication_query_handler() {
-            return [this, id = m_authentication_query_id](Object object) {
-                if(id == m_authentication_query_id) {
-                check_authentication_error(std::move(object));
-                }
-            };
-        }
         // Check authentication error
         void check_authentication_error(Object object);
             std::uint64_t next_query_id() {

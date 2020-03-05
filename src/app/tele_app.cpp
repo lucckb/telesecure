@@ -112,7 +112,9 @@ void tele_app::on_switch_buffer(int num)
     std::unique_lock _lck(m_mtx);
     auto& win = gui::window_manager::get();
     if(m_chats[num]) {
-       win.win<gui::status_bar>(win_status)->set_active(m_chats[num]->id());
+       auto swin = win.win<gui::status_bar>(win_status);
+       swin->set_active(m_chats[num]->id());
+       swin->set_newmsg(m_chats[num]->id(),false);
        input::input_manager::get().forward_to_readline(num==0); 
        //Assig buffer to chat view 
        if(num!=m_current_buffer) {
@@ -150,13 +152,59 @@ void tele_app::register_commands()
             }
             return 0;
     });
+    m_console->registerCommand(
+        "authocode", [&](const CppReadline::Console::Arguments& args) {
+            if(args.size()<1) {
+                new_control_message("authcode: missing code arg");
+                return -1;
+            }
+            m_tcli->set_auth_code( args[0] );
+            return 0;
+    });
+    m_console->registerCommand(
+        "authname", [&](const CppReadline::Console::Arguments& args) {
+         if(args.size()<2) {
+                new_control_message("name: missing name surname");
+                return -1;
+            }
+            m_tcli->set_auth_user( args[0], args[1] );
+            return 0;
+    });
+    m_console->registerCommand(
+        "authpass", [&](const CppReadline::Console::Arguments& args) {
+            if(args.size()<1) {
+                new_control_message("authcode: missing password");
+                return -1;
+            }
+            m_tcli->set_auth_password( args[0] );
+            return 0;
+    });
+    m_console->registerCommand(
+        "authkey", [&](const CppReadline::Console::Arguments& args) {
+            if(args.size()<1) {
+                new_control_message("authcode: missing code key");
+                return -1;
+            }
+            m_tcli->set_enckey( args[0] );
+            return 0;
+    });
+    m_console->registerCommand(
+        "authphoneno", [&](const CppReadline::Console::Arguments& args) {
+            if(args.size()<1) {
+                new_control_message("authcode: missing phone");
+                return -1;
+            }
+            m_tcli->set_phone_number( args[0] );
+            return 0;
+    });
 }
 
 //When chat found
-std::shared_ptr<gui::chat_doc> tele_app::find_chat(id_t id) noexcept 
+std::pair<std::shared_ptr<gui::chat_doc>,int> tele_app::find_chat(id_t id) noexcept 
 {
-    for(auto ch : m_chats) if(ch->id()==id) return ch;
-    return m_chats[0];
+    for(int i=0;i<m_chats.size();++i) 
+        if(m_chats[i]->id()==id) return std::make_pair(m_chats[i],i);
+    return std::make_pair(m_chats[0],0);
 }
 
 //When new message from chat
@@ -164,10 +212,24 @@ void tele_app::on_new_message(uint64_t id, std::string_view /*name*/, std::strin
 {
     std::unique_lock _lck(m_mtx);
     auto chat = find_chat(id);
-    chat->add_line(msg);
+    chat.first->add_line(msg);
     auto& win = gui::window_manager::get();
     auto status = win.win<gui::status_bar>(win_status);
     status->set_newmsg(id,true);
+    if(m_current_buffer!=chat.second) {
+        win.win<gui::status_bar>(win_status)->set_newmsg(id,true);
+    }
+}
+
+//New control message
+void tele_app::new_control_message(std::string_view msg)
+{
+    std::unique_lock _lck(m_mtx);
+    m_chats[0]->add_line(msg);
+    if(m_current_buffer!=0) {
+         auto& win = gui::window_manager::get();
+        win.win<gui::status_bar>(win_status)->set_newmsg(0,true);
+    }
 }
 
 }
