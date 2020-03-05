@@ -17,7 +17,7 @@ namespace app {
         auto create_authentication_query_handler() {
             return [this, id = m_authentication_query_id](Object object) {
                 if(id == m_authentication_query_id) {
-                check_authentication_error(std::move(object));
+                    check_authentication_error(std::move(object));
                 }
             };
         }
@@ -55,8 +55,6 @@ namespace app {
             send_query(td::td_api::make_object<td::td_api::setAuthenticationPhoneNumber>(phoneno, nullptr),
                 create_authentication_query_handler());
         }
-        //Set encryption key
-        void set_enckey( std::string key );
     private:
         //Telegram main client thread
         void client_thread();
@@ -92,7 +90,7 @@ namespace app {
         users_t m_users;
         chat_title_t m_chat_title;
         authorization_state_t m_authorization_state;
-        std::uint64_t m_current_query_id{};
-        std::uint64_t m_authentication_query_id{};
+        std::uint64_t m_current_query_id {};
+        std::uint64_t m_authentication_query_id {};
     };
 };

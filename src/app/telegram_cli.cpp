@@ -2,6 +2,7 @@
 #include <app/tele_app.hpp>
 #include <chrono>
 
+
 namespace app {
 namespace td_api = td::td_api;
 
@@ -34,7 +35,6 @@ auto overloaded(F... f) {
 //Constructor
 telegram_cli::telegram_cli(tele_app& app)
     : m_app(app)
-    , m_client(new td::Client())
 {
     td::Client::execute({0, td_api::make_object<td_api::setLogVerbosityLevel>(1)});
 }
@@ -62,6 +62,7 @@ void telegram_cli::wait_for_terminate()
  //Telegram main client thread
 void telegram_cli::client_thread()
 {
+    m_client = std::make_unique<td::Client>();
     while(m_thread_running)
     {
         if(m_need_restart) {
@@ -83,10 +84,15 @@ void telegram_cli::client_thread()
   //Restart client
 void telegram_cli::restart()
 {
-    m_client.reset();
     m_need_restart = false;
     m_are_authorized = false;
-    //TODO: Fill the reset object state variables
+    m_handlers.clear();
+    m_users.clear();
+    m_chat_title.clear();
+    m_authorization_state.reset();
+    m_current_query_id = 0;
+    m_authentication_query_id = 0;
+    m_client = std::make_unique<td::Client>();
 }
 
 //Process response
@@ -171,9 +177,13 @@ void telegram_cli::on_authorization_state_update()
               m_app.new_control_message("Confirm this login link on another device: " + state.link_ );
             },
             [this](td_api::authorizationStateWaitPhoneNumber &) {
+               m_app.new_control_message("Enter your phone number");
             },
             [this](td_api::authorizationStateWaitEncryptionKey &) {
-              m_app.new_control_message("Enter encryption key using command authenckey <key>");
+                using namespace std::chrono_literals;
+                std::this_thread::sleep_for(1s);
+                send_query(td_api::make_object<td_api::checkDatabaseEncryptionKey>(),
+                  create_authentication_query_handler());
             },
             [this](td_api::authorizationStateWaitTdlibParameters &) {
               auto parameters = td_api::make_object<td_api::tdlibParameters>();
@@ -205,7 +215,9 @@ void telegram_cli::check_authentication_error(Object object)
 {
     if (object->get_id() == td_api::error::ID) {
       auto error = td::move_tl_object_as<td_api::error>(object);
-       m_app.new_control_message( "Error: " + to_string(error) );
+      auto str = to_string(error);
+      str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
+      m_app.new_control_message( "Error: " + str );
       on_authorization_state_update();
     }
 }
@@ -219,15 +231,5 @@ std::string telegram_cli::get_user_name(std::int32_t user_id)
     return it->second->first_name_ + " " + it->second->last_name_;
 }
 
-//Set encryption key
-void  telegram_cli::set_enckey( std::string key )
-{
-   if (key == "DESTROY") {
-      send_query(td_api::make_object<td_api::destroy>(), create_authentication_query_handler());
-    } else {
-      send_query(td_api::make_object<td_api::checkDatabaseEncryptionKey>(std::move(key)),
-                  create_authentication_query_handler());
-    }
-}
 
 }

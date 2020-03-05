@@ -7,6 +7,11 @@ set(CURSES_NEED_WIDE TRUE)
 find_package(Curses REQUIRED)
 find_package(Readline REQUIRED)
 
+#Boost header only
+find_package(Boost 1.72.0)
+include_directories(${Boost_INCLUDE_DIRS})
+
+
 #Compiler definiton
 add_compile_definitions(_XOPEN_SOURCE_EXTENDED)
 

@@ -94,7 +94,8 @@
         "climits": "cpp",
         "ctgmath": "cpp",
         "cstdbool": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "variant": "cpp"
     },
     "cmake.debugConfig": {
         "stopAtEntry": true,
