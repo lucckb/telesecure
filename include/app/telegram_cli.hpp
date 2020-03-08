@@ -44,17 +44,27 @@ namespace app {
                     create_authentication_query_handler());
         }
         //Set auth passwoord
-        void set_auth_password( std::string authpass )
-        {
+        void set_auth_password( std::string authpass ) {
             send_query(td::td_api::make_object<td::td_api::checkAuthenticationPassword>(authpass),
                 create_authentication_query_handler());
         }
         //Set phone number
-        void set_phone_number( std::string phoneno )
-        {
+        void set_phone_number( std::string phoneno ) {
             send_query(td::td_api::make_object<td::td_api::setAuthenticationPhoneNumber>(phoneno, nullptr),
                 create_authentication_query_handler());
         }
+        // Open chat
+        void open_chat(std::uint64_t id) {
+            send_query(td::td_api::make_object<td::td_api::openChat>(id),{});
+        }
+        // Close chat
+        void close_chat(std::uint64_t id) {
+            send_query(td::td_api::make_object<td::td_api::closeChat>(id),{});
+        }
+        // View message read
+        void view_message(std::uint64_t id,std::int64_t msgid);
+        // Get user list
+        void get_user_list();
     private:
         //Telegram main client thread
         void client_thread();
@@ -70,7 +80,8 @@ namespace app {
         void send_query(td::td_api::object_ptr<td::td_api::Function> f, std::function<void(Object)> handler);
         // Check authentication error
         void check_authentication_error(Object object);
-            std::uint64_t next_query_id() {
+        //Next query ID
+        std::uint64_t next_query_id() noexcept {
             return ++m_current_query_id;
         }
         // Get user name

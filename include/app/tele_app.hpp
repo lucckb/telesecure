@@ -33,7 +33,7 @@ namespace app {
         //Main thread
         void run();
         //When new message from chat
-        void on_new_message(uint64_t id, std::string_view name, std::string_view msg);
+        void on_new_message(std::int64_t id, std::int64_t msgid, std::string_view name, std::string_view msg);
         //New control message
         void new_control_message(std::string_view msg);
     private:

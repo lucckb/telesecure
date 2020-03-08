@@ -152,8 +152,9 @@ void tele_app::register_commands()
             }
             return 0;
     });
+    //Authorization code
     m_console->registerCommand(
-        "authocode", [&](const CppReadline::Console::Arguments& args) {
+        "authcode", [&](const CppReadline::Console::Arguments& args) {
             if(args.size()<2) {
                 new_control_message("authcode: missing code arg");
                 return -1;
@@ -170,6 +171,7 @@ void tele_app::register_commands()
             m_tcli->set_auth_user( args[1], args[2] );
             return 0;
     });
+    //Authorization name
     m_console->registerCommand(
         "authpass", [&](const CppReadline::Console::Arguments& args) {
             if(args.size()<2) {
@@ -179,6 +181,7 @@ void tele_app::register_commands()
             m_tcli->set_auth_password( args[1] );
             return 0;
     });
+    //Authorization phone
     m_console->registerCommand(
         "authphoneno", [&](const CppReadline::Console::Arguments& args) {
             if(args.size()<2) {
@@ -188,28 +191,32 @@ void tele_app::register_commands()
             m_tcli->set_phone_number( args[1] );
             return 0;
     });
+    //Register command get chat list
+    m_console->registerCommand(
+        "userlist", [&](const CppReadline::Console::Arguments& args) {
+         m_tcli->get_user_list();
+         return 0;
+    });
 }
 
 //When chat found
 std::pair<std::shared_ptr<gui::chat_doc>,int> tele_app::find_chat(id_t id) noexcept 
 {
     for(int i=0;i<m_chats.size();++i) 
-        if(m_chats[i]->id()==id) return std::make_pair(m_chats[i],i);
+        if(m_chats[i]&&m_chats[i]->id()==id) return std::make_pair(m_chats[i],i);
     return std::make_pair(m_chats[0],0);
 }
 
 //When new message from chat
-void tele_app::on_new_message(uint64_t id, std::string_view /*name*/, std::string_view msg)
+void tele_app::on_new_message(std::int64_t id, std::int64_t msgid, std::string_view name, std::string_view msg)
 {
+    using namespace std::string_literals;
     std::unique_lock _lck(m_mtx);
-    auto chat = find_chat(id);
-    chat.first->add_line(msg);
+    auto chat = find_chat(id); 
+    chat.first->add_line(!chat.second?(std::string(name)+ ": "s + std::string(msg)):msg);
     auto& win = gui::window_manager::get();
-    auto status = win.win<gui::status_bar>(win_status);
-    status->set_newmsg(id,true);
-    if(m_current_buffer!=chat.second) {
-        win.win<gui::status_bar>(win_status)->set_newmsg(id,true);
-    }
+    if(m_current_buffer==chat.second) m_tcli->view_message(id,msgid);
+    else win.win<gui::status_bar>(win_status)->set_newmsg(id,true);
     win.repaint();
 }
 
