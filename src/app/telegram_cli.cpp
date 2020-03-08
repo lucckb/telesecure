@@ -68,7 +68,7 @@ void telegram_cli::wait_for_terminate()
     m_thread.join();
 }
 
-//Telegram main client thread
+//Telegram main client thread loop
 void telegram_cli::client_thread()
 {
     m_client = std::make_unique<td::Client>();
@@ -158,6 +158,7 @@ void telegram_cli::process_update(td_api::object_ptr<td_api::Object> update)
                      [](auto &update) {}));
 }
 
+// Authorization state update
 void telegram_cli::on_authorization_state_update()
 {
     m_authentication_query_id++;
@@ -219,6 +220,7 @@ void telegram_cli::on_authorization_state_update()
             }));
 }
 
+// Send telegram query
 void telegram_cli::send_query(td_api::object_ptr<td_api::Function> f, std::function<void(Object)> handler)
 {
     auto query_id = next_query_id();
@@ -229,6 +231,7 @@ void telegram_cli::send_query(td_api::object_ptr<td_api::Function> f, std::funct
     m_client->send({query_id, std::move(f)});
 }
 
+//Check authentication error
 void telegram_cli::check_authentication_error(Object object)
 {
     if (object->get_id() == td_api::error::ID)
@@ -293,6 +296,29 @@ void telegram_cli::get_chat_list()
             m_app.new_control_message("[id:" + std::to_string(chat_id) + "] [title:" +  m_chat_title[chat_id] + "]");
         }
     });
+}
+
+// Open chat
+void telegram_cli::open_chat(std::uint64_t id, std::function<void()> completed) {
+    send_query(td_api::make_object<td_api::openChat>(id), 
+        [this,completed](Object object) {
+            if (object->get_id() == td_api::error::ID) {
+                return;
+            }
+        completed();
+    });
+}
+
+//Send message to the selected chat client
+void telegram_cli::send_message_to(std::int64_t id, std::string_view msg)
+{
+    auto send_message = td_api::make_object<td_api::sendMessage>();
+    send_message->chat_id_ = id;
+    auto message_content = td_api::make_object<td_api::inputMessageText>();
+    message_content->text_ = td_api::make_object<td_api::formattedText>();
+    message_content->text_->text_ = std::move(msg);
+    send_message->input_message_content_ = std::move(message_content);
+    send_query(std::move(send_message), {});
 }
 
 } // namespace app

@@ -54,9 +54,7 @@ namespace app {
                 create_authentication_query_handler());
         }
         // Open chat
-        void open_chat(std::uint64_t id) {
-            send_query(td::td_api::make_object<td::td_api::openChat>(id),{});
-        }
+        void open_chat(std::uint64_t id, std::function<void()> completed);
         // Close chat
         void close_chat(std::uint64_t id) {
             send_query(td::td_api::make_object<td::td_api::closeChat>(id),{});
@@ -67,6 +65,13 @@ namespace app {
         void get_user_list();
         // Get chat lists
         void get_chat_list();
+        //Get chat title
+        std::string get_chat_title(std::int64_t id) const noexcept {
+            const auto ret = m_chat_title.find(id);
+            return ret!=m_chat_title.end()?ret->second:"";
+        }
+        //Send message to the selected chat client
+        void send_message_to(std::int64_t id, std::string_view msg);
     private:
         //Telegram main client thread
         void client_thread();
@@ -88,8 +93,6 @@ namespace app {
         }
         // Get user name
         std::string get_user_name(std::int32_t user_id);
-        //Get user chat list
-
     private:
         tele_app& m_app;
         std::unique_ptr<td::Client> m_client;

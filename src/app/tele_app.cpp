@@ -104,12 +104,12 @@ void tele_app::on_line_completed( )
     auto& win = gui::window_manager::get();
     win.win<gui::edit_box>(win_edit)->clear();
     win.repaint();
+    //TODO handle sending message
 }
 
 // On switch buffer
-void tele_app::on_switch_buffer(int num)
+void tele_app::on_switch_buffer_nolock(int num)
 {
-    std::unique_lock _lck(m_mtx);
     auto& win = gui::window_manager::get();
     if(m_chats[num]) {
        auto swin = win.win<gui::status_bar>(win_status);
@@ -203,6 +203,10 @@ void tele_app::register_commands()
          m_tcli->get_chat_list();
          return 0;
     });
+    //Register command create new chat
+    m_console->registerCommand(
+        "newchat", std::bind(&tele_app::on_new_chat_create, this, std::placeholders::_1)
+    );
 }
 
 //When chat found
@@ -219,7 +223,7 @@ void tele_app::on_new_message(std::int64_t id, std::int64_t msgid, std::string_v
     using namespace std::string_literals;
     std::unique_lock _lck(m_mtx);
     auto chat = find_chat(id); 
-    chat.first->add_line(!chat.second?(std::string(name)+ ": "s + std::string(msg)):msg);
+    chat.first->add_line(!chat.second?("[" + std::to_string(id)+"] [" + std::string(name)+ "]: "s + std::string(msg)):msg);
     auto& win = gui::window_manager::get();
     if(m_current_buffer==chat.second) m_tcli->view_message(id,msgid);
     else win.win<gui::status_bar>(win_status)->set_newmsg(id,true);
@@ -237,6 +241,46 @@ void tele_app::new_control_message(std::string_view msg)
     }
     win.repaint();
 }
+
+//! Find first free chat indentifier
+int tele_app::find_free_chat_slot() noexcept
+{
+    for(int i=0;i<m_chats.size();++i) {
+        if(!m_chats[i]) return i;
+    }
+    return -1;
+}
+
+//! Open and create new chat
+int tele_app::on_new_chat_create(const CppReadline::Console::Arguments& args)
+{
+    std::unique_lock _lck(m_mtx);
+    const auto nid = find_free_chat_slot();
+    if(args.size()<2) {
+        new_control_message("Error: invalid argument count. usage: newchat <id>");
+        return CppReadline::Console::ReturnCode::Ok;
+    }
+    if(nid<0) {
+        new_control_message("Error: Unable to allocate console for new chat");
+        return CppReadline::Console::ReturnCode::Error;
+    }
+    const auto chat_id = std::stoll(args[1]);
+    if(chat_id<=0) {
+        new_control_message("Error: Invalid chat id");
+        return CppReadline::Console::ReturnCode::Error;
+    }
+    m_tcli->open_chat(chat_id,[this,nid,chat_id]() {
+        std::unique_lock _lck(m_mtx);
+        auto& win = gui::window_manager::get();
+        const auto title = m_tcli->get_chat_title(chat_id);
+        m_chats[nid] = gui::chat_doc::clone(chat_id,title);
+        auto swin = win.win<gui::status_bar>(win_status);
+        swin->add_user(chat_id,title);
+        on_switch_buffer_nolock(nid);
+    });
+    return CppReadline::Console::ReturnCode::Ok;
+}
+
 
 }
 

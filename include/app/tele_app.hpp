@@ -46,11 +46,19 @@ namespace app {
         //Callback when input data completed
         void on_line_completed( );
         // On switch buffer
-        void on_switch_buffer(int window);
+        void on_switch_buffer_nolock(int window);
+        void on_switch_buffer(int window) {
+            std::unique_lock _lck(m_mtx);
+            on_switch_buffer_nolock(window);
+        }
         //! When readline parser complete commmand
         void on_readline_completed(int code);
-        //When chat found
+        //! When chat found
         std::pair<std::shared_ptr<gui::chat_doc>,int> find_chat(id_t id) noexcept;
+        //! Find first free chat indentifier
+        int find_free_chat_slot() noexcept;
+        //! Open and create new chat
+        int on_new_chat_create(const CppReadline::Console::Arguments& args);
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         int m_current_buffer {};
