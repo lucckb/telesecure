@@ -197,6 +197,12 @@ void tele_app::register_commands()
          m_tcli->get_user_list();
          return 0;
     });
+    //Register command get chat list
+    m_console->registerCommand(
+        "chatlist", [&](const CppReadline::Console::Arguments& args) {
+         m_tcli->get_chat_list();
+         return 0;
+    });
 }
 
 //When chat found

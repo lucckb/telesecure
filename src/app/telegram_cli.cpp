@@ -266,14 +266,31 @@ void telegram_cli::get_user_list()
     [&](Object object) {
         if(object->get_id() == td_api::error::ID) return;
         const auto users = td::move_tl_object_as<td_api::users>(object)->user_ids_;
+        m_app.new_control_message("Loading user lists...");
         for( auto user : users ) {
             send_query(td_api::make_object<td_api::getUserFullInfo>(user), 
             [&](Object object) {
                 if(object->get_id() == td_api::error::ID) return; 
                 const auto userinfo = td::move_tl_object_as<td_api::user>(object);
-                m_app.new_control_message("id: " + std::to_string(userinfo->id_) 
-                    + " Name: " + userinfo->first_name_ + " Surname: " + userinfo->last_name_);
+                m_app.new_control_message("[id:" + std::to_string(userinfo->id_) + 
+                    + "] [Name:" + userinfo->first_name_ + "] [Surname:" + userinfo->last_name_ + "]");
             });
+        }
+    });
+}
+
+// Get chat lists
+void telegram_cli::get_chat_list()
+{
+    send_query(td_api::make_object<td_api::getChats>(nullptr, std::numeric_limits<std::int64_t>::max(), 0, 20),
+        [this](Object object) {
+        if (object->get_id() == td_api::error::ID) {
+            return;
+        }
+        m_app.new_control_message("Loading chat lists...");
+        auto chats = td::move_tl_object_as<td_api::chats>(object);
+        for (auto chat_id : chats->chat_ids_) {
+            m_app.new_control_message("[id:" + std::to_string(chat_id) + "] [title:" +  m_chat_title[chat_id] + "]");
         }
     });
 }

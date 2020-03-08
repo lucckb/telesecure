@@ -65,6 +65,8 @@ namespace app {
         void view_message(std::uint64_t id,std::int64_t msgid);
         // Get user list
         void get_user_list();
+        // Get chat lists
+        void get_chat_list();
     private:
         //Telegram main client thread
         void client_thread();
@@ -86,6 +88,8 @@ namespace app {
         }
         // Get user name
         std::string get_user_name(std::int32_t user_id);
+        //Get user chat list
+
     private:
         tele_app& m_app;
         std::unique_ptr<td::Client> m_client;
