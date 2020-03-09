@@ -157,56 +157,73 @@ void tele_app::register_commands()
         "authcode", [&](const CppReadline::Console::Arguments& args) {
             if(args.size()<2) {
                 new_control_message("authcode: missing code arg");
-                return -1;
+                return CppReadline::Console::ReturnCode::Error;
             }
             m_tcli->set_auth_code( args[1] );
-            return 0;
+            return CppReadline::Console::ReturnCode::Ok;
     });
     m_console->registerCommand(
         "authname", [&](const CppReadline::Console::Arguments& args) {
          if(args.size()<3) {
                 new_control_message("name: missing name surname");
-                return -1;
+                return CppReadline::Console::ReturnCode::Error;
             }
             m_tcli->set_auth_user( args[1], args[2] );
-            return 0;
+            return CppReadline::Console::ReturnCode::Ok;
     });
     //Authorization name
     m_console->registerCommand(
         "authpass", [&](const CppReadline::Console::Arguments& args) {
             if(args.size()<2) {
                 new_control_message("authcode: missing password");
-                return -1;
+                return CppReadline::Console::ReturnCode::Error;
             }
             m_tcli->set_auth_password( args[1] );
-            return 0;
+            return CppReadline::Console::ReturnCode::Ok;
     });
     //Authorization phone
     m_console->registerCommand(
         "authphoneno", [&](const CppReadline::Console::Arguments& args) {
             if(args.size()<2) {
                 new_control_message("authcode: missing phone");
-                return -1;
+                return CppReadline::Console::ReturnCode::Error;
             }
             m_tcli->set_phone_number( args[1] );
-            return 0;
+            return CppReadline::Console::ReturnCode::Ok;
     });
     //Register command get chat list
     m_console->registerCommand(
         "userlist", [&](const CppReadline::Console::Arguments& args) {
          m_tcli->get_user_list();
-         return 0;
+         return CppReadline::Console::ReturnCode::Ok;
     });
     //Register command get chat list
     m_console->registerCommand(
         "chatlist", [&](const CppReadline::Console::Arguments& args) {
          m_tcli->get_chat_list();
-         return 0;
+         return CppReadline::Console::ReturnCode::Ok;
     });
     //Register command create new chat
     m_console->registerCommand(
         "newchat", std::bind(&tele_app::on_new_chat_create, this, std::placeholders::_1)
     );
+    //Send message to the selected chat
+    m_console->registerCommand(
+        "msg", [&](const CppReadline::Console::Arguments& args) {
+        if(args.size()<3) {
+            new_control_message("msg: missing id or message");
+            return CppReadline::Console::ReturnCode::Error;
+        }
+        const auto id = std::stoll(args[1]);
+        if(id<0) {
+            new_control_message("msg: Invalid id");
+            return CppReadline::Console::ReturnCode::Error;
+        }
+        std::string msgs;
+        for(auto iv=args.begin()+2;iv!=args.end();++iv) msgs += *iv + " ";
+        m_tcli->send_message_to(id,msgs);
+        return CppReadline::Console::ReturnCode::Ok;
+    });
 }
 
 //When chat found
