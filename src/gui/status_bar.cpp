@@ -30,6 +30,7 @@ void status_bar::do_draw_screen(detail::window_driver_context& ctx)
     for( const auto& it : m_users ) {
         const auto& i = it.second;
         if(m_active==it.first) setcolor(win,fgcolor(),color_t::red, attrib_t::underline);
+        else setcolor(win,fgcolor(),bgcolor());
         wprintw(win,"%s%c ", bar_name(i.username).c_str(),i.newmsg?'*':(i.online?'+':' '));
         if(m_active==it.first) unsetattributes(win);
     }

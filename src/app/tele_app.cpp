@@ -303,6 +303,7 @@ int tele_app::on_new_chat_create(const CppReadline::Console::Arguments& args)
         auto swin = win.win<gui::status_bar>(win_status);
         swin->add_user(chat_id,title);
         on_switch_buffer_nolock(nid);
+        win.repaint();
     });
     return CppReadline::Console::ReturnCode::Ok;
 }
