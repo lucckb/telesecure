@@ -102,10 +102,12 @@ void tele_app::on_line_completed( )
 {
     std::unique_lock _lck(m_mtx);
     auto& win = gui::window_manager::get();
-    win.win<gui::edit_box>(win_edit)->clear();
+    auto ebox = win.win<gui::edit_box>(win_edit);
+    const auto id = m_chats[m_current_buffer]->id();
+    m_tcli->send_message_to(id,ebox->line());
+    ebox->clear();
     win.repaint();
-    //TODO handle sending message
-}
+} 
 
 // On switch buffer
 void tele_app::on_switch_buffer_nolock(int num)

@@ -23,6 +23,9 @@ namespace gui {
         void del_char();
         // Clear buffer 
         void clear();
+        std::string_view line() const noexcept {
+            return m_line;
+        }
         //Special function in readline mode
         void on_readline_handle(const char* prompt, const char* linebuf, int point);
     private:
