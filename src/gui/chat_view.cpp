@@ -41,4 +41,12 @@ void chat_view::do_draw_screen( detail::window_driver_context& ctx )
     }
 }
 
+
+     //Assign view to the container
+void chat_view::set_view(std::shared_ptr<chat_doc> view) 
+{
+    wclear(ctx().win());
+    m_view = view;
+}
+
 }

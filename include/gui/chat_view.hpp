@@ -16,9 +16,7 @@ namespace gui {
             return std::make_shared<chat_view>(bg,fg);
         }
         //Assign view to the container
-        void set_view( std::shared_ptr<chat_doc> view) {
-            m_view = view;
-        }
+        void set_view( std::shared_ptr<chat_doc> view);
     protected:
          // Do draw screen function
         void do_draw_screen(detail::window_driver_context& ctx) override;

@@ -84,7 +84,7 @@ void telegram_cli::client_thread()
         }
         else
         {
-            auto response = m_client->receive(10);
+            auto response = m_client->receive(1);
             if (response.object)
             {
                 process_response(std::move(response));
