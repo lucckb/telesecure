@@ -128,6 +128,13 @@ void tele_app::on_switch_buffer_nolock(int num)
     }
 }
 
+void tele_app::on_switch_buffer(int window) 
+{
+    std::unique_lock _lck(m_mtx);
+    on_switch_buffer_nolock(window);
+    gui::window_manager::get().repaint();
+}
+
 //! When readline parser complete commmand
 void tele_app::on_readline_completed(int code)
 {

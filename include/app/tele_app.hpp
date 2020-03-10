@@ -47,10 +47,7 @@ namespace app {
         void on_line_completed( );
         // On switch buffer
         void on_switch_buffer_nolock(int window);
-        void on_switch_buffer(int window) {
-            std::unique_lock _lck(m_mtx);
-            on_switch_buffer_nolock(window);
-        }
+        void on_switch_buffer(int window);
         //! When readline parser complete commmand
         void on_readline_completed(int code);
         //! When chat found
