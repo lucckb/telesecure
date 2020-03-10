@@ -19,6 +19,7 @@ namespace app {
     // Core class application
     class tele_app {
         static constexpr auto num_chats = 12;
+        static constexpr auto code_failure = -1;
         enum {
             win_status,
             win_view,

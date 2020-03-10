@@ -274,7 +274,7 @@ int tele_app::find_free_chat_slot() noexcept
     for(int i=0;i<m_chats.size();++i) {
         if(!m_chats[i]) return i;
     }
-    return -1;
+    return code_failure;
 }
 
 //! Open and create new chat
