@@ -40,10 +40,18 @@ namespace gui {
         auto who() const {
             return m_who;
         }
+        //Set and get last message ID
+        auto last_message_id() const noexcept {
+            return m_last_msg_id;
+        }
+        void last_message_id(id_t id) noexcept {
+            m_last_msg_id = id;
+        }
     private:
         std::list<item> m_items;
         std::list<item>::iterator m_curr_line { m_items.end() };
         const std::string m_who;
         const id_t m_id;
+        id_t m_last_msg_id;
     };
 }

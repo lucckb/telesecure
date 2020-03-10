@@ -122,6 +122,8 @@ void tele_app::on_switch_buffer_nolock(int num)
        if(num!=m_current_buffer) {
            auto chat =  win.win<gui::chat_view>(win_view);
            chat->set_view(m_chats[num]);
+           //Mark last message id as read
+           m_tcli->view_message( m_chats[num]->id(), m_chats[num]->last_message_id());
            //TODO: Redraw
        }
        m_current_buffer = num;
@@ -250,11 +252,12 @@ void tele_app::on_new_message(std::int64_t id, std::int64_t msgid, std::string_v
     std::unique_lock _lck(m_mtx);
     auto chat = find_chat(id); 
     chat.first->add_line(!chat.second?("[" + std::to_string(id)+"] [" + std::string(name)+ "]: "s + std::string(msg)):msg);
+    chat.first->last_message_id(msgid);
     auto& win = gui::window_manager::get();
     if(m_current_buffer==chat.second) m_tcli->view_message(id,msgid);
     else win.win<gui::status_bar>(win_status)->set_newmsg(id,true);
     win.repaint();
-}
+} 
 
 //New control message
 void tele_app::new_control_message(std::string_view msg)
