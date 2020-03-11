@@ -115,6 +115,7 @@ void tele_app::on_switch_buffer_nolock(int num)
     auto& win = gui::window_manager::get();
     if(m_chats[num]) {
        auto swin = win.win<gui::status_bar>(win_status);
+       auto edit = win.win<gui::edit_box>(win_edit);
        swin->set_active(m_chats[num]->id());
        swin->set_newmsg(m_chats[num]->id(),false);
        input::input_manager::get().forward_to_readline(num==0); 
@@ -124,7 +125,7 @@ void tele_app::on_switch_buffer_nolock(int num)
            chat->set_view(m_chats[num]);
            //Mark last message id as read
            m_tcli->view_message( m_chats[num]->id(), m_chats[num]->last_message_id());
-           //TODO: Redraw
+           edit->clear();
        }
        m_current_buffer = num;
     }

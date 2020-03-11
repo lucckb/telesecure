@@ -47,7 +47,9 @@ namespace gui
     void unsetattributes(WINDOW *wnd);
     //! Pop UTF8 from string
     void pop_utf8(std::string& x);
-
+    //! Utf8 strlen
+    std::size_t utf8_strlen(std::string_view str);
+    std::string text_wrap(std::string str, std::size_t location);
 }
 
 

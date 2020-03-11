@@ -89,4 +89,32 @@ void pop_utf8(std::string& x) {
     x.pop_back();
 }
 
+std::size_t utf8_strlen(std::string_view str)
+{
+    int c,i,ix,q;
+    for (q=0, i=0, ix=str.length(); i < ix; i++, q++)
+    {
+        c = (unsigned char) str[i];
+        if      (c>=0   && c<=127) i+=0;
+        else if ((c & 0xE0) == 0xC0) i+=1;
+        else if ((c & 0xF0) == 0xE0) i+=2;
+        else if ((c & 0xF8) == 0xF0) i+=3;
+        else if ((c & 0xFC) == 0xF8) i+=4; 
+        else if ((c & 0xFE) == 0xFC) i+=5;
+        else return 0;//invalid utf8
+    }
+    return q;
+}
+
+std::string text_wrap(std::string str, std::size_t location) 
+{
+    // your other code
+    int n = str.rfind(' ', location);
+    if (n != std::string::npos) {
+        str.at(n) = '\n';
+    }
+    // your other code
+    return str;
+}
+
 }

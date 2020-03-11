@@ -19,12 +19,11 @@ namespace {
 chat_view::chat_view(color_t bg, color_t fg)
        : window(0,bg,fg,false)
 {
-
 }
+
 //! Destructor
 chat_view::~chat_view()
 {
-
 }
 
 void chat_view::do_draw_screen( detail::window_driver_context& ctx )
@@ -42,11 +41,18 @@ void chat_view::do_draw_screen( detail::window_driver_context& ctx )
 }
 
 
-     //Assign view to the container
+//Assign view to the container
 void chat_view::set_view(std::shared_ptr<chat_doc> view) 
 {
     wclear(ctx().win());
     m_view = view;
 }
+
+/*
+//On create
+void chat_view::on_create(detail::window_driver_context& ctx)
+{
+}
+*/
 
 }
