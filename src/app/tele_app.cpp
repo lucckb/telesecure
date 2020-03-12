@@ -219,6 +219,10 @@ void tele_app::register_commands()
     m_console->registerCommand(
         "newchat", std::bind(&tele_app::on_new_chat_create, this, std::placeholders::_1)
     );
+    //Register command delete chat
+    m_console->registerCommand(
+        "delchat", std::bind(&tele_app::on_new_chat_delete, this, std::placeholders::_1)
+    );
     //Send message to the selected chat
     m_console->registerCommand(
         "msg", [&](const CppReadline::Console::Arguments& args) {
@@ -246,6 +250,14 @@ std::pair<std::shared_ptr<gui::chat_doc>,int> tele_app::find_chat(id_t id) noexc
     for(int i=0;i<m_chats.size();++i) 
         if(m_chats[i]&&m_chats[i]->id()==id) return std::make_pair(m_chats[i],i);
     return std::make_pair(m_chats[0],0);
+}
+
+//FInd existing chat
+int tele_app::find_existing_chat(id_t id) noexcept
+{
+    for(int i=0;i<m_chats.size();++i) 
+        if(m_chats[i]&&m_chats[i]->id()==id)  return i;
+    return code_failure;
 }
 
 //When new message from chat
@@ -290,7 +302,7 @@ int tele_app::on_new_chat_create(const CppReadline::Console::Arguments& args)
     const auto nid = find_free_chat_slot();
     if(args.size()<2) {
         new_control_message("Error: invalid argument count. usage: newchat <id>");
-        return CppReadline::Console::ReturnCode::Ok;
+        return CppReadline::Console::ReturnCode::Error;
     }
     if(nid<0) {
         new_control_message("Error: Unable to allocate console for new chat");
@@ -300,7 +312,7 @@ int tele_app::on_new_chat_create(const CppReadline::Console::Arguments& args)
     try {
         chat_id = std::stol(args[1]);
     } catch( std::invalid_argument& ) {
-         new_control_message("msg: Invalid argument");
+         new_control_message("newchat: Invalid argument <chatid>");
          return CppReadline::Console::ReturnCode::Error;
     }
     m_tcli->open_chat(chat_id,[this,nid,chat_id]() {
@@ -316,6 +328,32 @@ int tele_app::on_new_chat_create(const CppReadline::Console::Arguments& args)
     return CppReadline::Console::ReturnCode::Ok;
 }
 
+//! Delete existing chat
+int tele_app::on_new_chat_delete(const CppReadline::Console::Arguments& args)
+{
+     std::unique_lock _lck(m_mtx);
+      if(args.size()<2) {
+        new_control_message("Error: invalid argument count. usage: delchat <id>");
+        return CppReadline::Console::ReturnCode::Error;
+    }
+    long chat_id;
+    try {
+        chat_id = std::stol(args[1]);
+    } catch( std::invalid_argument& ) {
+         new_control_message("delchat: Invalid argument <chatid>");
+         return CppReadline::Console::ReturnCode::Error;
+    }
+    const auto ord = find_existing_chat(chat_id);
+    if(ord<0) {
+        new_control_message("delchat: Selected chat not found");
+        return CppReadline::Console::ReturnCode::Error;
+    }
+    on_switch_buffer_nolock(0);
+    auto& win = gui::window_manager::get();
+    win.win<gui::status_bar>(win_status)->del_user(chat_id);
+    m_chats[ord].reset();
+    return CppReadline::Console::ReturnCode::Ok;
+}
 
 }
 

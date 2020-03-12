@@ -51,12 +51,14 @@ namespace app {
         void on_switch_buffer(int window);
         //! When readline parser complete commmand
         void on_readline_completed(int code);
+        //! Open and create new chat
+        int on_new_chat_create(const CppReadline::Console::Arguments& args);
         //! When chat found
         std::pair<std::shared_ptr<gui::chat_doc>,int> find_chat(id_t id) noexcept;
         //! Find first free chat indentifier
         int find_free_chat_slot() noexcept;
-        //! Open and create new chat
-        int on_new_chat_create(const CppReadline::Console::Arguments& args);
+        int find_existing_chat(id_t id) noexcept;
+        int on_new_chat_delete(const CppReadline::Console::Arguments& args);
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         int m_current_buffer {};

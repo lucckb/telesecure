@@ -72,11 +72,5 @@ void chat_view::set_view(std::shared_ptr<chat_doc> view)
     m_view = view;
 }
 
-/*
-//On create
-void chat_view::on_create(detail::window_driver_context& ctx)
-{
-}
-*/
 
 }
