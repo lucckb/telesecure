@@ -42,7 +42,7 @@ void chat_view::do_draw_screen( detail::window_driver_context& ctx )
         getmaxyx(win,maxy,maxx);
         //Calculate lines from the end
         const int hdrsiz = utf8_strlen(m_view->who()) + c_date_siz + c_hdr_siz;
-        auto i = items.end();
+        auto i = items.end(); --i;
         for (int nlines=0;i!=items.begin(); --i) { 
             nlines += linecount(i->line,maxx,hdrsiz);
             if(nlines>=maxy) break;

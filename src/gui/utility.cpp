@@ -93,6 +93,7 @@ void pop_utf8(std::string& x) {
 std::size_t utf8_strlen(std::string_view str)
 {
     int c,i,ix,q;
+    if(str.empty()) return 0;
     for (q=0, i=0, ix=str.length(); i < ix; i++, q++)
     {
         c = (unsigned char) str[i];
