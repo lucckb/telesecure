@@ -147,13 +147,14 @@ void telegram_cli::process_update(td_api::object_ptr<td_api::Object> update)
                      [this](td_api::updateNewMessage &update_new_message) {
                          auto chat_id = update_new_message.message_->chat_id_;
                          auto msg_id = update_new_message.message_->id_;
+                         auto outgoing = update_new_message.message_->is_outgoing_;
                          auto sender_user_name = get_user_name(update_new_message.message_->sender_user_id_);
                          std::string text;
                          if (update_new_message.message_->content_->get_id() == td_api::messageText::ID)
                          {
                              text = static_cast<td_api::messageText &>(*update_new_message.message_->content_).text_->text_;
                          }
-                         m_app.on_new_message(chat_id, msg_id, sender_user_name, text);
+                         m_app.on_new_message(chat_id, msg_id, sender_user_name, text,outgoing);
                      },
                      [](auto &update) {}));
 }

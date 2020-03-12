@@ -247,12 +247,12 @@ std::pair<std::shared_ptr<gui::chat_doc>,int> tele_app::find_chat(id_t id) noexc
 }
 
 //When new message from chat
-void tele_app::on_new_message(std::int64_t id, std::int64_t msgid, std::string_view name, std::string_view msg)
+void tele_app::on_new_message(std::int64_t id, std::int64_t msgid, std::string_view name, std::string_view msg, bool outgoing)
 {
     using namespace std::string_literals;
     std::unique_lock _lck(m_mtx);
     auto chat = find_chat(id); 
-    chat.first->add_line(!chat.second?("[" + std::to_string(id)+"] [" + std::string(name)+ "]: "s + std::string(msg)):msg);
+    chat.first->add_line(!chat.second?("[" + std::to_string(id)+"] [" + std::string(name)+ "]: "s + std::string(msg)):msg,outgoing);
     chat.first->last_message_id(msgid);
     auto& win = gui::window_manager::get();
     if(m_current_buffer==chat.second) m_tcli->view_message(id,msgid);

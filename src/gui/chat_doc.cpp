@@ -4,9 +4,9 @@ namespace gui
 {
 
 //Add single line
-void chat_doc::add_line(std::string_view line)
+void chat_doc::add_line(std::string_view line, bool outgoing)
 {      
-      m_items.emplace_back(line);
+      m_items.emplace_back(line,outgoing);
       while(m_items.size() > maxnlines) {
         m_items.pop_front();
       }

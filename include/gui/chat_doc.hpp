@@ -12,11 +12,12 @@ namespace gui {
     class chat_doc {
         static const auto maxnlines = 1000;
         struct item {
-            item( std::string_view _line)
-                : time(std::time(nullptr)),line(_line)
+            item( std::string_view _line, bool _outgoing)
+                : time(std::time(nullptr)),line(_line),outgoing(_outgoing)
             {}
             std::time_t time;
             std::string line;
+            bool outgoing;
         };
      public:
         //! Set owner
@@ -28,7 +29,7 @@ namespace gui {
             return std::make_shared<chat_doc>(id,who);
         }
         //Add single line
-        void add_line( std::string_view line);
+        void add_line(std::string_view line, bool outgoing=false);
          const auto& items() const noexcept {
             return m_items;
         }

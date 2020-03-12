@@ -50,7 +50,15 @@ void chat_view::do_draw_screen( detail::window_driver_context& ctx )
         scrollok(win, TRUE);
         int ln=0;
         for (;i!=items.end(); ++i) {
-            mvwprintw(win,ln,0,"%s@%s> %s\n",m_view->who().c_str(),time2str(i->time).c_str(),i->line.c_str());
+            std::string who;
+            if(!i->outgoing) {   //Is Sender
+                setcolor(win,fgcolor(),bgcolor());
+                who = m_view->who();
+            } else {    //Im not sender
+                setcolor(win,color_t::blue,bgcolor());
+                who = "Me";
+            }
+            mvwprintw(win,ln,0,"%s@%s> %s\n",who.c_str(),time2str(i->time).c_str(),i->line.c_str());
             ln += linecount(i->line,maxx,hdrsiz);
         }
         scrollok(win, FALSE);
