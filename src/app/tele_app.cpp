@@ -7,6 +7,8 @@
 #include <gui/chat_doc.hpp>
 #include <readline/readline.h>
 #include <app/telegram_cli.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 
 namespace app {
 
@@ -382,6 +384,14 @@ int tele_app::on_new_chat_delete(const CppReadline::Console::Arguments& args)
     win.win<gui::status_bar>(win_status)->del_user(chat_id);
     m_chats[ord].reset();
     return CppReadline::Console::ReturnCode::Ok;
+}
+
+
+//Save buffer state
+void tele_app::save_opened_buffers()
+{
+//https://stackoverflow.com/questions/2114466/creating-json-arrays-in-boost-using-property-trees
+//https://www.boost.org/doc/libs/1_61_0/doc/html/property_tree/tutorial.html
 }
 
 }

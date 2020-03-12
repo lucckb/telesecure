@@ -21,9 +21,9 @@ namespace app {
         static constexpr auto num_chats = 12;
         static constexpr auto code_failure = -1;
         enum {
-            win_status,
-            win_view,
-            win_edit
+            win_status, //Status window show chats in the top bar
+            win_view,   //Chat view window is the main chat window
+            win_edit    //Window edit for pass message to sender
         };
     public:
         //Constructor
@@ -60,9 +60,14 @@ namespace app {
         std::pair<std::shared_ptr<gui::chat_doc>,int> find_chat(id_t id) noexcept;
         //! Find first free chat indentifier
         int find_free_chat_slot() noexcept;
+        //! Find existing chat
         int find_existing_chat(id_t id) noexcept;
+        //When delete chat handler
         int on_new_chat_delete(const CppReadline::Console::Arguments& args);
+        //Control message pass without mutex protection
         void control_message_nlock(std::string_view msg);
+        //Save buffer state
+        void save_opened_buffers();
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         int m_current_buffer {};
