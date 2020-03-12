@@ -15,7 +15,9 @@ namespace {
         backspace = 127,
         backspace2 = 263,
         enter = 10,
-        escape = 27
+        escape = 27,
+        right_arrow = 360,
+        left_arrow = 262
     };};
 
     constexpr auto keytab_sz = 12;
@@ -34,6 +36,13 @@ namespace {
         {0x5b, 0x32, 0x34, 0x7e} //12
     };
 
+    constexpr auto arrow_sz = 1;
+    constexpr char arrow_right[1][4] = {
+        {91,70} // OSX kbd
+    };
+    constexpr char arrow_left[1][4] = {
+        {91,72}  // OSX kbd
+    };
 }
 
 namespace input
@@ -74,6 +83,18 @@ bool input_manager::readline_mode()
            for(int i=0;i<keytab_sz;i++) {
                if(!memcmp(keytab[i],buf,n)) {
                     m_switch_window_cb(i);
+                    return false;
+               }
+           }
+           for(int i=0;i<arrow_sz;i++) {
+               if(!memcmp(arrow_right[i],buf,n)) {
+                    m_switch_right_cb();
+                    return false;
+               }
+           }
+           for(int i=0;i<arrow_sz;i++) {
+               if(!memcmp(arrow_left[i],buf,n)) {
+                    m_switch_left_cb();
                     return false;
                }
            }
@@ -122,6 +143,13 @@ bool input_manager::normal_mode()
         case key::enter:
             m_line_completed_cb();
             break;
+        //Right arrow
+        case key::right_arrow:
+            m_switch_right_cb();
+            break;
+        case key::left_arrow:
+            m_switch_left_cb();
+            break;
         //Forward to the input box
         default: 
             if(std::iswprint(ch) && ret!=KEY_CODE_YES) {
@@ -134,7 +162,8 @@ bool input_manager::normal_mode()
 
 
  //Enable forwarding to the readline
-void input_manager::forward_to_readline(bool enable) noexcept {
+void input_manager::forward_to_readline(bool enable) noexcept 
+{
     m_forward_readline = enable;
     //Keypad enabled only on nonreadline mode
     keypad(stdscr, m_forward_readline?FALSE:TRUE);	/* We get F1, F2 etc..		*/
