@@ -84,6 +84,7 @@ int colorpair(color_t fg, color_t bg)
 
 
 void pop_utf8(std::string& x) {
+    if(x.empty()) return;
     while (!is_leading_utf8_byte(x.back()))
         x.pop_back();
     x.pop_back();
