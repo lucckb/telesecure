@@ -1,7 +1,7 @@
 #pragma once
 #include "window.hpp"
 #include <string>
-#include <map>
+#include <list>
 #include <input/Console.hpp>
 
 namespace gui {
@@ -43,7 +43,7 @@ namespace gui {
         // Do draw screen function
         void do_draw_screen( detail::window_driver_context& ctx ) override;
     private:
-        std::map<id_t,item> m_users;
+        std::vector<std::pair<id_t,item>> m_users;
         id_t m_active {};
     };
 }

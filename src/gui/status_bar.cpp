@@ -39,13 +39,13 @@ void status_bar::do_draw_screen(detail::window_driver_context& ctx)
 //Add new user to status bar
 void status_bar::add_user( id_t id, std::string_view name )
 {
-    m_users.emplace(id,item(name,false,false));
+    m_users.emplace_back(std::make_pair(id,item(name,false,false)));
 }
 
 //Delete new user form status 
 void status_bar::del_user( id_t id )
 {
-    const auto it = m_users.find(id);
+    const auto it = std::find_if(m_users.begin(),m_users.end(),[id](const auto& it){return it.first==id;});
     if( it != m_users.end() )
         m_users.erase(it);
 }
@@ -53,7 +53,7 @@ void status_bar::del_user( id_t id )
 //Set message online
 void status_bar::set_online( id_t id, bool online )
 {
-    const auto it = m_users.find(id);
+    const auto it = std::find_if(m_users.begin(),m_users.end(),[id](const auto& it){return it.first==id;});
     if( it != m_users.end() ) {
         it->second.online = online;
     }
@@ -62,7 +62,7 @@ void status_bar::set_online( id_t id, bool online )
 //Set new message
 void status_bar::set_newmsg( id_t id, bool newmsg )
 {
-    const auto it = m_users.find(id);
+    const auto it = std::find_if(m_users.begin(),m_users.end(),[id](const auto& it){return it.first==id;});
     if( it != m_users.end() ) {
         it->second.newmsg = newmsg;
     }
