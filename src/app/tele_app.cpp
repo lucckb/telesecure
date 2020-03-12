@@ -329,7 +329,7 @@ int tele_app::on_new_chat_create(const CppReadline::Console::Arguments& args)
         m_chats[nid] = gui::chat_doc::clone(chat_id,title);
         auto swin = win.win<gui::status_bar>(win_status);
         swin->add_user(chat_id,title);
-        on_switch_buffer_nolock(nid);
+        control_message_nlock("Chat: " + std::to_string(chat_id) + " opened at slot F" + std::to_string(nid+1));
         win.repaint();
     });
     return CppReadline::Console::ReturnCode::Ok;
