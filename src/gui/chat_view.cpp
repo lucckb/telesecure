@@ -47,8 +47,8 @@ void chat_view::do_draw_screen( detail::window_driver_context& ctx )
             nlines += linecount(i->line,maxx,hdrsiz);
             if(nlines>=maxy) break;
         }
+        wclear(win);
         scrollok(win, TRUE);
-        int ln=0;
         for (;i!=items.end(); ++i) {
             std::string who;
             if(!i->outgoing) {   //Is Sender
@@ -58,8 +58,7 @@ void chat_view::do_draw_screen( detail::window_driver_context& ctx )
                 setcolor(win,color_t::blue,bgcolor());
                 who = "Me";
             }
-            mvwprintw(win,ln,0,"%s@%s> %s\n",who.c_str(),time2str(i->time).c_str(),i->line.c_str());
-            ln += linecount(i->line,maxx,hdrsiz);
+            wprintw(win,"%s@%s> %s\n",who.c_str(),time2str(i->time).c_str(),i->line.c_str());
         }
         scrollok(win, FALSE);
     }
