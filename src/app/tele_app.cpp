@@ -67,9 +67,32 @@ void tele_app::init_input()
         std::bind(&CppReadline::Console::forwardToReadline,
         std::ref(m_console),std::placeholders::_1)
     );
+    //When readline option completed
     m_console->registerCommandCompleted(
         std::bind(&tele_app::on_readline_completed, this, std::placeholders::_1)
     );
+    //When right arrow is pressed
+    inp.register_switch_right( [&]() {
+        std::unique_lock _lck(m_mtx);
+        for(int i=m_current_buffer+1;i<m_chats.size();++i) {
+            if(m_chats[i]) {
+                on_switch_buffer_nolock(i);
+                gui::window_manager::get().repaint();
+                return; 
+            }
+        }
+    });
+    //Wgen prev arrow is pressed
+    inp.register_switch_left( [&]() {
+        std::unique_lock _lck(m_mtx);
+        for(int i=m_current_buffer-1;i>=0;--i) {
+            if(m_chats[i]) {
+                on_switch_buffer_nolock(i);
+                gui::window_manager::get().repaint();
+                return; 
+            }
+        }
+    });
 }
 
 // Run main handler
