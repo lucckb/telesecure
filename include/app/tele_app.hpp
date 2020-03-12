@@ -64,7 +64,6 @@ namespace app {
         int on_new_chat_delete(const CppReadline::Console::Arguments& args);
         void control_message_nlock(std::string_view msg);
     private:
-    private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         int m_current_buffer {};
         std::unique_ptr<CppReadline::Console> m_console;

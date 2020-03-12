@@ -19,7 +19,6 @@ tele_app::tele_app()
 //Destructor
 tele_app::~tele_app()
 {
-
 }
 
 //Initialize gui
