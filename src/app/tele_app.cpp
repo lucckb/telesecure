@@ -60,7 +60,7 @@ void tele_app::init_input()
     //Readline refresh added
     m_console->registerRedisplayCommand([&]() {
         std::unique_lock _lck(m_mtx);
-        win.win<gui::edit_box>(win_edit)->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
+        win.win<gui::edit_box>(win_edit)->on_readline_handle(rl_display_prompt,rl_line_buffer,rl_point);
     });
     //Readline callback bind function
     inp.register_readline_callback(
@@ -116,15 +116,18 @@ void tele_app::on_switch_buffer_nolock(int num)
     if(m_chats[num]) {
        auto swin = win.win<gui::status_bar>(win_status);
        auto edit = win.win<gui::edit_box>(win_edit);
+       input::input_manager::get().forward_to_readline(num==0);
        swin->set_active(m_chats[num]->id());
        swin->set_newmsg(m_chats[num]->id(),false);
-       input::input_manager::get().forward_to_readline(num==0); 
        //Assig buffer to chat view 
        if(num!=m_current_buffer) {
            auto chat =  win.win<gui::chat_view>(win_view);
            chat->set_view(m_chats[num]);
            //Mark last message id as read
            m_tcli->view_message( m_chats[num]->id(), m_chats[num]->last_message_id());
+           if(num==0) {
+                edit->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
+           }
            edit->clear();
        }
        m_current_buffer = num;
@@ -212,8 +215,8 @@ void tele_app::register_commands()
     //Register command get chat list
     m_console->registerCommand(
         "chatlist", [&](const CppReadline::Console::Arguments& args) {
-         m_tcli->get_chat_list();
-         return CppReadline::Console::ReturnCode::Ok;
+        m_tcli->get_chat_list();
+        return CppReadline::Console::ReturnCode::Ok;
     });
     //Register command create new chat
     m_console->registerCommand(
@@ -275,9 +278,8 @@ void tele_app::on_new_message(std::int64_t id, std::int64_t msgid, std::string_v
 } 
 
 //New control message
-void tele_app::new_control_message(std::string_view msg)
+void tele_app::control_message_nlock(std::string_view msg)
 {
-    std::unique_lock _lck(m_mtx);
     m_chats[0]->add_line(msg);
     auto& win = gui::window_manager::get();
     if(m_current_buffer!=0) {
@@ -331,8 +333,8 @@ int tele_app::on_new_chat_create(const CppReadline::Console::Arguments& args)
 //! Delete existing chat
 int tele_app::on_new_chat_delete(const CppReadline::Console::Arguments& args)
 {
-     std::unique_lock _lck(m_mtx);
-      if(args.size()<2) {
+    std::unique_lock _lck(m_mtx);
+    if(args.size()<2) {
         new_control_message("Error: invalid argument count. usage: delchat <id>");
         return CppReadline::Console::ReturnCode::Error;
     }
@@ -345,7 +347,7 @@ int tele_app::on_new_chat_delete(const CppReadline::Console::Arguments& args)
     }
     const auto ord = find_existing_chat(chat_id);
     if(ord<0) {
-        new_control_message("delchat: Selected chat not found");
+        control_message_nlock("delchat: Selected chat not found");
         return CppReadline::Console::ReturnCode::Error;
     }
     on_switch_buffer_nolock(0);
@@ -357,3 +359,4 @@ int tele_app::on_new_chat_delete(const CppReadline::Console::Arguments& args)
 
 }
 
+ 

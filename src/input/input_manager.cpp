@@ -54,6 +54,7 @@ void input_manager::loop()
 bool input_manager::readline_mode()
 {
     auto ch = getch();
+    if(ch==ERR) return false;
     switch(ch) {
         // Leave mode
         case CTRL('c'): 
@@ -92,6 +93,7 @@ bool input_manager::normal_mode()
     wint_t ch;
     std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert;
     const auto ret = get_wch(&ch);
+    if(ch==ERR) return false;
     switch(ch) 
     {
         // Leave mode

@@ -36,7 +36,10 @@ namespace app {
         //When new message from chat
         void on_new_message(std::int64_t id, std::int64_t msgid, std::string_view name, std::string_view msg, bool outgoing);
         //New control message
-        void new_control_message(std::string_view msg);
+        void new_control_message(std::string_view msg) {
+            std::unique_lock _lck(m_mtx);
+            control_message_nlock(msg);
+        }
     private:
         //Initialize GUI
         void init_gui();
@@ -59,6 +62,8 @@ namespace app {
         int find_free_chat_slot() noexcept;
         int find_existing_chat(id_t id) noexcept;
         int on_new_chat_delete(const CppReadline::Console::Arguments& args);
+        void control_message_nlock(std::string_view msg);
+    private:
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         int m_current_buffer {};
