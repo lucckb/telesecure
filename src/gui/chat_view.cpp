@@ -6,13 +6,18 @@
 namespace gui {
 
 namespace {
-       std::string time2str(std::time_t tim)
-       {
-           char buf[32] {};
-           auto tm = std::localtime(&tim);
-           std::snprintf(buf,sizeof buf,"%02i:%02i",tm->tm_hour,tm->tm_min);
-           return buf;
-       }
+    std::string time2str(std::time_t tim)
+    {
+        char buf[32] {};
+        auto tm = std::localtime(&tim);
+        std::snprintf(buf,sizeof buf,"%02i:%02i",tm->tm_hour,tm->tm_min);
+        return buf;
+    }
+    std::size_t linecount(std::string_view str, std::size_t maxx, std::size_t extra=0)
+    {
+        const int slen = utf8_strlen(str) + extra;
+        return slen/maxx + !!(slen%maxx);
+    }
 }
 
 //! Construtor
@@ -26,33 +31,6 @@ chat_view::~chat_view()
 {
 }
 
-#if 0
-void chat_view::do_draw_screen( detail::window_driver_context& ctx )
-{
-     if( m_view ) {
-        auto win = ctx.win();
-        int maxx,maxy;
-        const auto items = m_view->items();
-        getmaxyx(win,maxy,maxx); maxy--;
-        for (auto i = items.rbegin(); i!=items.rend(); ++i) {
-           const auto nlen = utf8_strlen(i->line);
-           const auto nlines = nlen/maxx + !!(nlen%maxx);
-           for(int j=0,k=nlines-1;j<nlen;j+=maxx,--k) {
-               if(j==0) {
-                    const auto s = i->line.substr(0,maxx).c_str();
-                    mvwprintw(win,maxy+k,0,"%s@%s> %s\n",m_view->who().c_str(),time2str(i->time).c_str(),s);
-               } else {
-                   const auto s = i->line.substr(j,maxx).c_str();
-                   mvwprintw(win,maxy+k,0,"%s",s);
-               }
-           }
-           if(maxy<=0) break;
-           maxy-=nlines;
-      }
-    }
-}
-
-#else
 void chat_view::do_draw_screen( detail::window_driver_context& ctx )
 {
     constexpr auto c_date_siz = 5;
@@ -63,24 +41,22 @@ void chat_view::do_draw_screen( detail::window_driver_context& ctx )
         const auto items = m_view->items();
         getmaxyx(win,maxy,maxx);
         //Calculate lines from the end
-        int nlines=0;
         const int hdrsiz = utf8_strlen(m_view->who()) + c_date_siz + c_hdr_siz;
-        auto i = items.rbegin();
-        for (;i!=items.rend(); ++i) { 
-            const int slen = utf8_strlen(i->line) + hdrsiz;
-            nlines += slen/maxx + !!(slen/maxx);
+        auto i = items.end();
+        for (int nlines=0;i!=items.begin(); --i) { 
+            nlines += linecount(i->line,maxx,hdrsiz);
             if(nlines>=maxy) break;
         }
-        int j=0;
         scrollok(win, TRUE);
-        for (std::list<std::string>::const_iterator k=(i+1).base(); k!=items.end(); ++k,++j) {
-            mvwprintw(win,j,0,"%s@%s> %s\n",m_view->who().c_str(),time2str(i->time).c_str(),i->line.c_str());
+        int ln=0;
+        for (;i!=items.end(); ++i) {
+            mvwprintw(win,ln,0,"%s@%s> %s\n",m_view->who().c_str(),time2str(i->time).c_str(),i->line.c_str());
+            ln += linecount(i->line,maxx,hdrsiz);
         }
         scrollok(win, FALSE);
     }
 }
 
-#endif
 
 //Assign view to the container
 void chat_view::set_view(std::shared_ptr<chat_doc> view) 
