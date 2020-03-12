@@ -24,7 +24,8 @@ namespace CppReadline {
             enum ReturnCode {
                 Quit = -1,
                 Ok = 0,
-                Error = 1 // Or greater!
+                Error = 1, // Or greater!
+                NotFound = 2 // Command not found
             };
 
             /**

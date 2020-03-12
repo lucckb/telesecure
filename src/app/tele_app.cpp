@@ -48,7 +48,7 @@ void tele_app::init_input()
         std::unique_lock _lck(m_mtx);
         win.win<gui::edit_box>(win_edit)->add_new_char(ch);
         win.repaint();
-    });
+   });
     inp.register_delete_char([&](){
         std::unique_lock _lck(m_mtx);
         win.win<gui::edit_box>(win_edit)->del_char();
@@ -146,7 +146,7 @@ void tele_app::on_readline_completed(int code)
 {
     std::unique_lock _lck(m_mtx);
     auto& win = gui::window_manager::get();
-    if(code != CppReadline::Console::Ok) {
+    if(code == CppReadline::Console::NotFound) {
         m_chats[0]->add_line("Command not found");
     }
     win.repaint();
@@ -303,19 +303,24 @@ int tele_app::on_new_chat_create(const CppReadline::Console::Arguments& args)
     std::unique_lock _lck(m_mtx);
     const auto nid = find_free_chat_slot();
     if(args.size()<2) {
-        new_control_message("Error: invalid argument count. usage: newchat <id>");
+        control_message_nlock("Error: invalid argument count. usage: newchat <id>");
         return CppReadline::Console::ReturnCode::Error;
     }
     if(nid<0) {
-        new_control_message("Error: Unable to allocate console for new chat");
+        control_message_nlock("Error: Unable to allocate console for new chat");
         return CppReadline::Console::ReturnCode::Error;
     }
     long chat_id;
     try {
         chat_id = std::stol(args[1]);
     } catch( std::invalid_argument& ) {
-         new_control_message("newchat: Invalid argument <chatid>");
+         control_message_nlock("newchat: Invalid argument <chatid>");
          return CppReadline::Console::ReturnCode::Error;
+    }
+    auto existing_id = find_existing_chat(chat_id);
+    if(existing_id>=0) {
+        control_message_nlock("newchat: Chat already opened");
+        return CppReadline::Console::ReturnCode::Error;
     }
     m_tcli->open_chat(chat_id,[this,nid,chat_id]() {
         std::unique_lock _lck(m_mtx);
@@ -335,14 +340,14 @@ int tele_app::on_new_chat_delete(const CppReadline::Console::Arguments& args)
 {
     std::unique_lock _lck(m_mtx);
     if(args.size()<2) {
-        new_control_message("Error: invalid argument count. usage: delchat <id>");
+        control_message_nlock("Error: invalid argument count. usage: delchat <id>");
         return CppReadline::Console::ReturnCode::Error;
     }
     long chat_id;
     try {
         chat_id = std::stol(args[1]);
     } catch( std::invalid_argument& ) {
-         new_control_message("delchat: Invalid argument <chatid>");
+         control_message_nlock("delchat: Invalid argument <chatid>");
          return CppReadline::Console::ReturnCode::Error;
     }
     const auto ord = find_existing_chat(chat_id);

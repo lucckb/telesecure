@@ -165,7 +165,7 @@ namespace CppReadline {
             return static_cast<int>((it->second)(inputs));
         }
 
-        return ReturnCode::Error;
+        return ReturnCode::NotFound;
     }
 
     int Console::executeFile(const std::string & filename) {
