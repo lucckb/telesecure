@@ -407,8 +407,6 @@ int tele_app::on_new_chat_delete(const CppReadline::Console::Arguments& args)
 //Save buffer state
 void tele_app::save_opened_buffers()
 {
-//https://stackoverflow.com/questions/2114466/creating-json-arrays-in-boost-using-property-trees
-//https://www.boost.org/doc/libs/1_61_0/doc/html/property_tree/tutorial.html
     namespace pt = boost::property_tree;
     pt::ptree tree;
     pt::ptree child;
