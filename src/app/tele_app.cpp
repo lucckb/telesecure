@@ -10,22 +10,14 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <filesystem>
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
+#include <gui/utility.hpp>
+
 
 namespace app {
 
 namespace {
     constexpr auto conf_file = "/.config/telesecure/config.xml";
     constexpr auto conf_dir = "/.config/telesecure";
-    std::string home_dir() {
-        const char *homedir;
-        if ((homedir = getenv("HOME")) == nullptr) {
-            homedir = getpwuid(getuid())->pw_dir;
-        }   
-        return homedir;
-    }
 }
 
 // Constructor
@@ -420,8 +412,8 @@ void tele_app::save_opened_buffers()
         }
     }
     tree.add_child("config.chats",child);
-    std::filesystem::create_directories(home_dir()+conf_dir);
-    pt::write_xml(home_dir()+conf_file,tree);
+    std::filesystem::create_directories(util::home_dir()+conf_dir);
+    pt::write_xml(util::home_dir()+conf_file,tree);
 }
 
 //Read confgutation
@@ -431,7 +423,7 @@ std::vector<std::pair<int,long>> tele_app::read_config()
     pt::ptree tree;
     std::vector<std::pair<int,long>> ret;
     try {
-        pt::read_xml(home_dir()+conf_file, tree);
+        pt::read_xml(util::home_dir()+conf_file, tree);
         auto child =  tree.get_child("config.chats");
         for(const auto& el: child) {
             if(el.first=="item") {

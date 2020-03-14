@@ -1,6 +1,9 @@
 #include <gui/utility.hpp>
 #include <curses.h>
 #include <string>
+#include <sys/types.h>
+#include <pwd.h>
+#include <unistd.h>
 
 namespace gui {
 
@@ -119,4 +122,17 @@ std::string text_wrap(std::string str, std::size_t location)
     return str;
 }
 
+
+}
+
+namespace util {
+// Get home directory
+std::string home_dir() 
+ {
+    const char *homedir;
+    if ((homedir = getenv("HOME")) == nullptr) {
+        homedir = getpwuid(getuid())->pw_dir;
+    }   
+    return homedir;
+}
 }

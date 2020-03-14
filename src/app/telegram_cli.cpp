@@ -2,6 +2,7 @@
 #include <app/tele_app.hpp>
 #include <chrono>
 #include <string>
+#include <gui/utility.hpp>
 
 /** Use openChat/closeChat class for read acknowledgement
     * https://github.com/tdlib/td/issues/46
@@ -206,7 +207,7 @@ void telegram_cli::on_authorization_state_update()
             },
             [this](td_api::authorizationStateWaitTdlibParameters &) {
                 auto parameters = td_api::make_object<td_api::tdlibParameters>();
-                parameters->database_directory_ = ".telesecure";
+                parameters->database_directory_ = util::home_dir()+ "/.config/telesecure/tdlib";
                 parameters->use_message_database_ = true;
                 parameters->use_secret_chats_ = true;
                 parameters->api_id_ = 94575;
