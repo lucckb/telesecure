@@ -40,6 +40,8 @@ namespace app {
             std::unique_lock _lck(m_mtx);
             control_message_nlock(msg);
         }
+         //Restore last buffers
+        void restore_opened_buffers();
     private:
         //Initialize GUI
         void init_gui();
@@ -68,6 +70,8 @@ namespace app {
         void control_message_nlock(std::string_view msg);
         //Save buffer state
         void save_opened_buffers();
+        //Read configuration
+        std::vector<std::pair<int,long>> read_config();
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         int m_current_buffer {};

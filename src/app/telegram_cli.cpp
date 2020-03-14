@@ -169,6 +169,7 @@ void telegram_cli::on_authorization_state_update()
             [this](td_api::authorizationStateReady &) {
                 m_are_authorized = true;
                 m_app.new_control_message("Got authorization");
+                m_app.restore_opened_buffers();
             },
             [this](td_api::authorizationStateLoggingOut &) {
                 m_are_authorized = false;
@@ -204,7 +205,6 @@ void telegram_cli::on_authorization_state_update()
                            create_authentication_query_handler());
             },
             [this](td_api::authorizationStateWaitTdlibParameters &) {
-                m_app.new_control_message("got_param");
                 auto parameters = td_api::make_object<td_api::tdlibParameters>();
                 parameters->database_directory_ = ".telesecure";
                 parameters->use_message_database_ = true;

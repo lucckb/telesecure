@@ -8,9 +8,25 @@
 #include <readline/readline.h>
 #include <app/telegram_cli.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <filesystem>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 namespace app {
+
+namespace {
+    constexpr auto conf_file = "/.config/telesecure/config.xml";
+    constexpr auto conf_dir = "/.config/telesecure";
+    std::string home_dir() {
+        const char *homedir;
+        if ((homedir = getenv("HOME")) == nullptr) {
+            homedir = getpwuid(getuid())->pw_dir;
+        }   
+        return homedir;
+    }
+}
 
 // Constructor
 tele_app::tele_app()
@@ -119,6 +135,7 @@ void tele_app::run()
     //Wait Stop the telegram client and wait for termination
     m_tcli->stop();
     m_tcli->wait_for_terminate();
+    save_opened_buffers();
 }
 
  //Callback when input data completed
@@ -392,6 +409,61 @@ void tele_app::save_opened_buffers()
 {
 //https://stackoverflow.com/questions/2114466/creating-json-arrays-in-boost-using-property-trees
 //https://www.boost.org/doc/libs/1_61_0/doc/html/property_tree/tutorial.html
+    namespace pt = boost::property_tree;
+    pt::ptree tree;
+    pt::ptree child;
+    for(int i=1;i<m_chats.size();++i)
+    {
+        if(m_chats[i]) {
+            pt::ptree item;
+            item.put("chat_slot",i);
+            item.put("chat_id",m_chats[i]->id());
+            child.add_child("item", item);
+        }
+    }
+    tree.add_child("config.chats",child);
+    std::filesystem::create_directories(home_dir()+conf_dir);
+    pt::write_xml(home_dir()+conf_file,tree);
+}
+
+//Read confgutation
+std::vector<std::pair<int,long>> tele_app::read_config()
+{
+    namespace pt = boost::property_tree;
+    pt::ptree tree;
+    std::vector<std::pair<int,long>> ret;
+    try {
+        pt::read_xml(home_dir()+conf_file, tree);
+        auto child =  tree.get_child("config.chats");
+        for(const auto& el: child) {
+            if(el.first=="item") {
+                auto chat_id = el.second.get<int>("chat_id");
+                auto chat_slot = el.second.get<long>("chat_slot");
+                ret.push_back({chat_slot,chat_id});
+            }
+        }
+    } catch( const pt::xml_parser_error& er) {
+      
+    }
+    return ret;
+}
+
+//Restore last buffers
+void tele_app::restore_opened_buffers()
+{
+    const auto chat_list = read_config();
+    for(const auto& chat: chat_list) {
+        m_tcli->open_chat(chat.second,[this,chat]() {
+            auto& win = gui::window_manager::get();
+            const auto title = m_tcli->get_chat_title(chat.second);
+            m_chats[chat.first] = gui::chat_doc::clone(chat.second,title);
+            auto swin = win.win<gui::status_bar>(win_status);
+            swin->add_user(chat.second,title);
+            control_message_nlock("Chat: " + std::to_string(chat.second)
+                 + " opened at slot F" + std::to_string(chat.first+1));
+            win.repaint();
+        });
+    }
 }
 
 }
