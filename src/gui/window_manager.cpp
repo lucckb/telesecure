@@ -125,6 +125,7 @@ void window_manager::resize_all()
         } else {
             r.cy = avg_y;
         }
+        wnd->changed(true);
         wnd->resize(r);
         wnd->changed(false);
         r.y += r.cy;
