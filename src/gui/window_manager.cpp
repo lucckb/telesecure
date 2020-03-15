@@ -75,10 +75,11 @@ void window_manager::add_window( std::shared_ptr<window> win )
  //! Repaint all windowss
 void window_manager::repaint( )
 {
-   wnoutrefresh(stdscr);
+    wnoutrefresh(stdscr);
     for( auto wnd : m_winlist ) {
         if(!wnd) std::logic_error("Null Window exception");
         wnd->paint();
+        wnd->changed(false);
     }
     doupdate();
 }
@@ -125,6 +126,7 @@ void window_manager::resize_all()
             r.cy = avg_y;
         }
         wnd->resize(r);
+        wnd->changed(false);
         r.y += r.cy;
     }
     doupdate();

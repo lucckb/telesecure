@@ -26,7 +26,7 @@ namespace gui {
         //! Noncopyable 2 
         window& operator=(window&) = delete; 
         // Paint window
-        void paint();
+        bool paint();
         // Resize window according to signal
         virtual void resize(const rect& rect);
         // Get border 
@@ -38,9 +38,13 @@ namespace gui {
         }
         // Real windows create
         void create(const rect& width);
+         //Changed state
+        void changed(bool val) noexcept {
+            m_changed = val;
+        }
     protected:
         // Draw window but without refresh
-        virtual void do_draw_screen(detail::window_driver_context& ctx) = 0;
+        virtual bool do_draw_screen(detail::window_driver_context& ctx) = 0;
         // When window is created
         virtual void on_create(detail::window_driver_context& ctx) {
         
@@ -57,11 +61,17 @@ namespace gui {
         auto& ctx() {
             return *m_ctx;
         } 
+        //Changed state
+        auto changed() const noexcept {
+            return m_changed;
+        }
+       
     private:
         color_t m_fg {};    //! Foreground color
         color_t m_bg {};    //! Background color
         bool m_border {};   //! Draw border
         int m_recommended_size {};  //! Recommended size
         std::unique_ptr<detail::window_driver_context> m_ctx;
+        bool m_changed {true};
     };
 }

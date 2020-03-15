@@ -19,7 +19,7 @@ namespace gui {
         void set_view( std::shared_ptr<chat_doc> view);
     protected:
          // Do draw screen function
-        void do_draw_screen(detail::window_driver_context& ctx) override;
+        bool do_draw_screen(detail::window_driver_context& ctx) override;
         //On create
         //void on_create(detail::window_driver_context& ctx) override;
     private:

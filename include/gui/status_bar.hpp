@@ -41,7 +41,7 @@ namespace gui {
         void set_active( id_t id );
     protected:
         // Do draw screen function
-        void do_draw_screen( detail::window_driver_context& ctx ) override;
+        bool do_draw_screen( detail::window_driver_context& ctx ) override;
     private:
         std::vector<std::pair<id_t,item>> m_users;
         id_t m_active {};

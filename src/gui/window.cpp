@@ -19,19 +19,23 @@ window::~window()
 }
 
  //! Draw empty window
-void window::paint()
+bool window::paint()
 {
+   bool ret;
    auto win = m_ctx->win();
-   setcolor(win, m_fg,m_bg);
+   //setcolor(win, m_fg,m_bg);
    if(m_border) box(m_ctx->winm(),0,0);
    wbkgd(win, colorpair(m_fg,m_bg));
-   do_draw_screen(*m_ctx);
-   unsetcolor(win, m_fg,m_bg);
-   if(m_border) {
-     wnoutrefresh(m_ctx->winm());
-    // wnoutrefresh(m_ctx->win());
+   ret = do_draw_screen(*m_ctx);
+   //unsetcolor(win, m_fg,m_bg);
+   if(ret) {
+        if(m_border) {
+            wnoutrefresh(m_ctx->winm());
+            // wnoutrefresh(m_ctx->win());
+        }
+         else wnoutrefresh(m_ctx->win());
    }
-   else wnoutrefresh(m_ctx->win());
+   return ret;
 }
 
 void window::create(const rect& rect)

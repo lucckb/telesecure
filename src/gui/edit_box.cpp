@@ -65,9 +65,10 @@ edit_box::~edit_box()
 }
 
 //! Draw screen
-void edit_box::do_draw_screen( detail::window_driver_context& ctx )
+bool edit_box::do_draw_screen( detail::window_driver_context& ctx )
 {
-    if(m_changed) {      
+    auto ret {changed()};
+    if(changed()) {      
         auto win = ctx.win();
         if(m_delchar) {
             m_delchar = false;
@@ -76,8 +77,8 @@ void edit_box::do_draw_screen( detail::window_driver_context& ctx )
         } else {
             waddstr(win,m_char.c_str());
         }
-        m_changed = false;
     }
+    return ret;
 }
 
 // When window is created
@@ -90,14 +91,14 @@ void edit_box::on_create(detail::window_driver_context& ctx)
 void edit_box::add_new_char( std::string_view ch )
 {
     m_char = ch;
-    m_changed = true;
+    changed(true);
     m_line += ch;
 }
 
  //Delete char at cursor
 void edit_box::del_char()
 {
-    m_changed = true;
+    changed(true);
     m_delchar = true;
     pop_utf8(m_line);
 }
@@ -105,7 +106,7 @@ void edit_box::del_char()
 // Clear buffer 
 void edit_box::clear()
 {
-    m_changed = true;
+    changed(true);
     m_delchar = true;
     m_line.clear();
 }

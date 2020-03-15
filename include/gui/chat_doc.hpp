@@ -48,11 +48,20 @@ namespace gui {
         void last_message_id(id_t id) noexcept {
             m_last_msg_id = id;
         }
+        //Set changed mode
+        auto changed() const noexcept {
+            return m_changed;
+        }
+        //Mark when displayed on screen
+        void displayed() noexcept {
+            m_changed = false;
+        }
     private:
         std::list<item> m_items;
         std::list<item>::iterator m_curr_line { m_items.end() };
         const std::string m_who;
         const id_t m_id;
         id_t m_last_msg_id;
+        bool m_changed { true };
     };
 }

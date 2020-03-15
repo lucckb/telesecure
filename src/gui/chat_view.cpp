@@ -31,11 +31,17 @@ chat_view::~chat_view()
 {
 }
 
-void chat_view::do_draw_screen( detail::window_driver_context& ctx )
+//When screen should be redrawed
+bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
 {
     constexpr auto c_date_siz = 5;
     constexpr auto c_hdr_siz = 2;
-    if( m_view ) {
+    if(m_view) {
+        changed( changed()| m_view->changed() );
+        m_view->displayed();
+    }
+    bool ret = changed();
+    if( m_view && (changed()||m_view->changed()) ) {
         auto win = ctx.win();
         int maxx,maxy;
         const auto items = m_view->items();
@@ -62,6 +68,7 @@ void chat_view::do_draw_screen( detail::window_driver_context& ctx )
         }
         scrollok(win, FALSE);
     }
+    return ret;
 }
 
 
@@ -70,6 +77,7 @@ void chat_view::set_view(std::shared_ptr<chat_doc> view)
 {
     wclear(ctx().win());
     m_view = view;
+    changed(true);
 }
 
 

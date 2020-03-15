@@ -11,6 +11,7 @@ void chat_doc::add_line(std::string_view line, bool outgoing)
         m_items.pop_front();
       }
       m_curr_line = m_items.end();
+      m_changed = true;
 }
 
 }

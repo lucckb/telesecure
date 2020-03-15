@@ -23,23 +23,29 @@ status_bar::~status_bar()
 }
 
 // Do draw screen function
-void status_bar::do_draw_screen(detail::window_driver_context& ctx)
+bool status_bar::do_draw_screen(detail::window_driver_context& ctx)
 {
     auto win = ctx.win();
-    wclear(win);
-    for( const auto& it : m_users ) {
-        const auto& i = it.second;
-        if(m_active==it.first) setcolor(win,fgcolor(),color_t::red, attrib_t::underline);
-        else setcolor(win,fgcolor(),bgcolor());
-        wprintw(win,"%s%c ", bar_name(i.username).c_str(),i.newmsg?'*':(i.online?'+':' '));
-        if(m_active==it.first) unsetattributes(win);
+    auto ret {changed()};
+    if(changed())
+    {
+        wclear(win);
+        for( const auto& it : m_users ) {
+            const auto& i = it.second;
+            if(m_active==it.first) setcolor(win,fgcolor(),color_t::red, attrib_t::underline);
+            else setcolor(win,fgcolor(),bgcolor());
+            wprintw(win,"%s%c ", bar_name(i.username).c_str(),i.newmsg?'*':(i.online?'+':' '));
+            if(m_active==it.first) unsetattributes(win);
+        }
     }
+    return ret;
 }
 
 //Add new user to status bar
 void status_bar::add_user( id_t id, std::string_view name )
 {
     m_users.emplace_back(std::make_pair(id,item(name,false,false)));
+    changed(true);
 }
 
 //Delete new user form status 
@@ -48,6 +54,7 @@ void status_bar::del_user( id_t id )
     const auto it = std::find_if(m_users.begin(),m_users.end(),[id](const auto& it){return it.first==id;});
     if( it != m_users.end() )
         m_users.erase(it);
+        changed(true);
 }
 
 //Set message online
@@ -56,6 +63,7 @@ void status_bar::set_online( id_t id, bool online )
     const auto it = std::find_if(m_users.begin(),m_users.end(),[id](const auto& it){return it.first==id;});
     if( it != m_users.end() ) {
         it->second.online = online;
+       changed(true);
     }
 }
 
@@ -65,6 +73,7 @@ void status_bar::set_newmsg( id_t id, bool newmsg )
     const auto it = std::find_if(m_users.begin(),m_users.end(),[id](const auto& it){return it.first==id;});
     if( it != m_users.end() ) {
         it->second.newmsg = newmsg;
+       changed(true);
     }
 }
 
@@ -72,6 +81,7 @@ void status_bar::set_newmsg( id_t id, bool newmsg )
 void status_bar::set_active( id_t id )
 {
     m_active = id;
+    changed(true);
 }
 
 }
