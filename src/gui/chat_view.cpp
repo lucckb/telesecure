@@ -46,6 +46,7 @@ bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
         int maxx,maxy;
         const auto items = m_view->items();
         getmaxyx(win,maxy,maxx);
+        curs_set(0);
         //Calculate lines from the end
         const int hdrsiz = utf8_strlen(m_view->who()) + c_date_siz + c_hdr_siz;
         auto i = items.end(); --i;
@@ -67,6 +68,7 @@ bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
             wprintw(win,"%s@%s> %s\n",who.c_str(),time2str(i->time).c_str(),i->line.c_str());
         }
         scrollok(win, FALSE);
+        curs_set(2);
     }
     return ret;
 }

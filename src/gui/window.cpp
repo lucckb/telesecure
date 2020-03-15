@@ -32,8 +32,9 @@ bool window::paint()
         if(m_border) {
             wnoutrefresh(m_ctx->winm());
             // wnoutrefresh(m_ctx->win());
+        } else {
+            wnoutrefresh(m_ctx->win());
         }
-         else wnoutrefresh(m_ctx->win());
    }
    return ret;
 }
@@ -66,9 +67,9 @@ void window::resize(const rect& rect)
     do_draw_screen(*m_ctx);
     if(m_border) {
         wnoutrefresh(m_ctx->winm());
+    } else {
+        wnoutrefresh(m_ctx->win());
     }
-    else wnoutrefresh(m_ctx->win());
 }
-
 
 }

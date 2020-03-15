@@ -158,10 +158,10 @@ void tele_app::on_switch_buffer_nolock(int num)
            chat->set_view(m_chats[num]);
            //Mark last message id as read
            m_tcli->view_message( m_chats[num]->id(), m_chats[num]->last_message_id());
+           edit->clear();
            if(num==0) {
                 edit->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
            }
-           edit->clear();
        }
        m_current_buffer = num;
     }

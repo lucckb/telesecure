@@ -77,6 +77,8 @@ bool edit_box::do_draw_screen( detail::window_driver_context& ctx )
         } else {
             waddstr(win,m_char.c_str());
         }
+    } else {
+        ret = true;
     }
     return ret;
 }
@@ -130,6 +132,7 @@ void edit_box::on_readline_handle(const char* prompt, const char* linebuf, int p
     }
     // We batch window updates when resizing
     wrefresh(cmd_win);
+    changed(true);
 }
 
 
