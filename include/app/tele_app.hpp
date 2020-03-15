@@ -18,7 +18,7 @@ namespace app {
     class telegram_cli;
     // Core class application
     class tele_app {
-        static constexpr auto num_chats = 12;
+        static constexpr auto num_chats = 13;
         static constexpr auto code_failure = -1;
         enum {
             win_status, //Status window show chats in the top bar
@@ -58,6 +58,8 @@ namespace app {
         void on_readline_completed(int code);
         //! Open and create new chat
         int on_new_chat_create(const CppReadline::Console::Arguments& args);
+        //On leave session
+        void on_leave_session();
         //! When chat found
         std::pair<std::shared_ptr<gui::chat_doc>,int> find_chat(id_t id) noexcept;
         //! Find first free chat indentifier

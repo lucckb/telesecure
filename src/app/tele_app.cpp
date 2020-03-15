@@ -11,6 +11,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <filesystem>
 #include <gui/utility.hpp>
+#include <boost/process.hpp>
 
 
 namespace app {
@@ -42,9 +43,11 @@ void tele_app::init_gui()
    auto edit = gui::edit_box::clone(gui::color_t::blue, gui::color_t::white);
    win.add_window(edit);
    //Create first chat only
-   m_chats[0] = gui::chat_doc::clone(0,"cmd"); 
+   m_chats[0] = gui::chat_doc::clone(0,"cmd");
    //Add bar user
    bar->add_user(0,"C M");
+   m_chats[m_chats.size()-1] = gui::chat_doc::clone(m_chats.size()-1,"shell");
+   bar->add_user(m_chats.size()-1,"S H");
 }
 
 // Initialize input box
@@ -63,6 +66,7 @@ void tele_app::init_input()
         win.win<gui::edit_box>(win_edit)->del_char();
         win.repaint();
     });
+    inp.register_leave_session(std::bind(&tele_app::on_leave_session,this));
     inp.register_line_completed(std::bind(&tele_app::on_line_completed,this));
     inp.register_switch_window(std::bind(&tele_app::on_switch_buffer,this,std::placeholders::_1));
     inp.forward_to_readline(true);
@@ -157,7 +161,9 @@ void tele_app::on_switch_buffer_nolock(int num)
            auto chat =  win.win<gui::chat_view>(win_view);
            chat->set_view(m_chats[num]);
            //Mark last message id as read
-           m_tcli->view_message( m_chats[num]->id(), m_chats[num]->last_message_id());
+           if(num!=0 || num!=num_chats-1) {
+                m_tcli->view_message( m_chats[num]->id(), m_chats[num]->last_message_id());
+           }
            edit->clear();
            if(num==0) {
                 edit->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
@@ -454,6 +460,21 @@ void tele_app::restore_opened_buffers()
             win.repaint();
         });
     }
+}
+
+//On leave session
+void tele_app::on_leave_session()
+{
+    std::unique_lock _lck(m_mtx);
+    on_switch_buffer_nolock(m_chats.size()-1);
+    using namespace boost::process;
+    ipstream pipe_stream;
+    child c("ps aux", std_out > pipe_stream);
+    std::string line;
+    while (pipe_stream && std::getline(pipe_stream, line) && !line.empty())
+        m_chats[m_chats.size()-1]->add_line(line);
+    c.wait();
+    gui::window_manager::get().repaint();
 }
 
 }

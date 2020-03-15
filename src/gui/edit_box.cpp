@@ -135,6 +135,5 @@ void edit_box::on_readline_handle(const char* prompt, const char* linebuf, int p
     changed(true);
 }
 
-
-}
+}   //GUI namespace END
  
