@@ -268,13 +268,13 @@ void telegram_cli::view_message(std::uint64_t id, std::int64_t msgid)
 void telegram_cli::get_user_list()
 {
     send_query(td_api::make_object<td_api::getContacts>(),
-    [&](Object object) {
+    [this](Object object) {
         if(object->get_id() == td_api::error::ID) return;
         const auto users = td::move_tl_object_as<td_api::users>(object)->user_ids_;
         m_app.new_control_message("Loading user lists...");
         for( auto user : users ) {
-            send_query(td_api::make_object<td_api::getUserFullInfo>(user), 
-            [&](Object object) {
+            send_query(td_api::make_object<td_api::getUser>(user), 
+            [this](Object object) {
                 if(object->get_id() == td_api::error::ID) return; 
                 const auto userinfo = td::move_tl_object_as<td_api::user>(object);
                 m_app.new_control_message("[id:" + std::to_string(userinfo->id_) + 
