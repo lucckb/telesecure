@@ -155,6 +155,10 @@ void telegram_cli::process_update(td_api::object_ptr<td_api::Object> update)
                          {
                              text = static_cast<td_api::messageText &>(*update_new_message.message_->content_).text_->text_;
                          }
+                         else if(update_new_message.message_->content_->get_id() == td_api::messagePhoto::ID) 
+                         {
+                             text = "Photo received caption:" + static_cast<td_api::messagePhoto &>(*update_new_message.message_->content_).caption_->text_;
+                         }
                          m_app.on_new_message(chat_id, msg_id, sender_user_name, text,outgoing);
                      },
                      [](auto &update) {}));
