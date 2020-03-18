@@ -49,6 +49,14 @@ namespace input {
         void register_readline_callback( std::function<void(char)> cb ) noexcept {
             m_readline_cb = cb;
         }
+        //Register page up and page down callback
+        void register_pageup_cb( std::function<void()> cb ) noexcept {
+            m_pageup_cb = cb;
+        }
+        //Register page up and page down callback
+        void register_pagedn_cb( std::function<void()> cb ) noexcept {
+            m_pagedn_cb = cb;
+        }
         //Handle input loop
         void loop();
     private:
@@ -67,6 +75,8 @@ namespace input {
         std::function<void()> m_line_completed_cb;
         std::function<void()> m_leave_cb;
         std::function<void(char)> m_readline_cb;
+        std::function<void()> m_pageup_cb;
+        std::function<void()> m_pagedn_cb;
         bool m_forward_readline {};
     };
 }

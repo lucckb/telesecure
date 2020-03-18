@@ -19,7 +19,9 @@ namespace {
         right_arrow = 360,
         right_arrow2 = 560,
         left_arrow = 262,
-        left_arrow2 = 545
+        left_arrow2 = 545,
+        page_up = 339,
+        page_dn = 338
     };};
 
     constexpr auto keytab_sz = 12;
@@ -46,6 +48,16 @@ namespace {
     constexpr char arrow_left[arrow_sz][5] = {
         {91,72},  // OSX kbd
         {'[','1',';','5','D'}   //Unix
+    };
+
+    constexpr auto pagekey_sz = 2;
+    constexpr char page_up[pagekey_sz][5] = {
+        { '[', '5', '~' }, // OSX kbd
+        { '[', '5', '~' }   //Unix
+    };
+    constexpr char page_down[pagekey_sz][5] = {
+        { '[', '6', '~' }, // OSX kbd
+        { '[', '6', '~' }   //Unix
     };
 }
 
@@ -84,26 +96,44 @@ bool input_manager::readline_mode()
         case key::escape: {
            char buf[16];
            const auto n = read_multichars(buf,sizeof buf);
+           //Switch buffer handle
            for(int i=0;i<keytab_sz;i++) {
                if(!memcmp(keytab[i],buf,n)) {
                     m_switch_window_cb(i);
                     return false;
                }
            }
+           //Arrow right handle
            for(int i=0;i<arrow_sz;i++) {
                if(!memcmp(arrow_right[i],buf,n)) {
                     m_switch_right_cb();
                     return false;
                }
            }
+           //Arrow left handle
            for(int i=0;i<arrow_sz;i++) {
                if(!memcmp(arrow_left[i],buf,n)) {
                     m_switch_left_cb();
                     return false;
                }
            }
-          m_readline_cb(key::escape);
-          back_multichars(buf,n);
+           //Page up handle
+           for(int i=0;i<pagekey_sz;i++) {
+               if(!memcmp(page_up[i],buf,n)) {
+                    m_pageup_cb();
+                    return false;
+               }
+           }
+          // Page down handle
+          for(int i=0;i<pagekey_sz;i++) {
+               if(!memcmp(page_down[i],buf,n)) {
+                    m_pagedn_cb();
+                    return false;
+               }
+          }
+         // Other keys
+         m_readline_cb(key::escape);
+         back_multichars(buf,n);
         }
         break;
         default:
@@ -152,9 +182,18 @@ bool input_manager::normal_mode()
         case key::right_arrow2:
             m_switch_right_cb();
             break;
+        //Left arrow
         case key::left_arrow:
         case key::left_arrow2:
             m_switch_left_cb();
+            break;
+        //Page up
+        case key::page_up:
+            m_pageup_cb();
+            break;
+        //Page down
+        case key::page_dn:
+            m_pagedn_cb();
             break;
         //Forward to the input box
         default: 
