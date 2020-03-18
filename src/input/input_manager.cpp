@@ -17,11 +17,13 @@ namespace {
         enter = 10,
         escape = 27,
         right_arrow = 360,
-        left_arrow = 262
+        right_arrow2 = 560,
+        left_arrow = 262,
+        left_arrow2 = 545
     };};
 
     constexpr auto keytab_sz = 12;
-    constexpr char keytab[12][4] = {
+    constexpr char keytab[keytab_sz][4] = {
         {0x4f, 0x50, 0, 0}, //1
         {0x4f, 0x51, 0, 0}, //2
         {0x4f, 0x52, 0, 0}, //3
@@ -36,12 +38,14 @@ namespace {
         {0x5b, 0x32, 0x34, 0x7e} //12
     };
 
-    constexpr auto arrow_sz = 1;
-    constexpr char arrow_right[1][4] = {
-        {91,70} // OSX kbd
+    constexpr auto arrow_sz = 2;
+    constexpr char arrow_right[arrow_sz][5] = {
+        {91,70}, // OSX kbd
+        { '[','1',';','5','C'}   //Unix
     };
-    constexpr char arrow_left[1][4] = {
-        {91,72}  // OSX kbd
+    constexpr char arrow_left[arrow_sz][5] = {
+        {91,72},  // OSX kbd
+        {'[','1',';','5','D'}   //Unix
     };
 }
 
@@ -145,9 +149,11 @@ bool input_manager::normal_mode()
             break;
         //Right arrow
         case key::right_arrow:
+        case key::right_arrow2:
             m_switch_right_cb();
             break;
         case key::left_arrow:
+        case key::left_arrow2:
             m_switch_left_cb();
             break;
         //Forward to the input box
