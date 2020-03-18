@@ -21,7 +21,9 @@ namespace {
         left_arrow = 262,
         left_arrow2 = 545,
         page_up = 339,
-        page_dn = 338
+        page_dn = 338,
+        page_up2 = 566,
+        page_dn2 = 525,
     };};
 
     constexpr auto keytab_sz = 12;
@@ -53,11 +55,11 @@ namespace {
     constexpr auto pagekey_sz = 2;
     constexpr char page_up[pagekey_sz][5] = {
         { '[', '5', '~' }, // OSX kbd
-        { '[', '5', '~' }   //Unix
+        { '[', '1', ';', '5', 'A'}   //Unix
     };
     constexpr char page_down[pagekey_sz][5] = {
         { '[', '6', '~' }, // OSX kbd
-        { '[', '6', '~' }   //Unix
+        { '[', '1', ';', '5', 'B'}   //Unix
     };
 }
 
@@ -189,10 +191,12 @@ bool input_manager::normal_mode()
             break;
         //Page up
         case key::page_up:
+        case key::page_up2:
             m_pageup_cb();
             break;
         //Page down
         case key::page_dn:
+        case key::page_dn2:
             m_pagedn_cb();
             break;
         //Forward to the input box
