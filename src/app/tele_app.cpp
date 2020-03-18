@@ -154,8 +154,8 @@ void tele_app::on_switch_buffer_nolock(int num)
        auto swin = win.win<gui::status_bar>(win_status);
        auto edit = win.win<gui::edit_box>(win_edit);
        input::input_manager::get().forward_to_readline(num==0);
-       swin->set_active(m_chats[num]->id());
-       swin->set_newmsg(m_chats[num]->id(),false);
+       swin->set_active(num);
+       swin->set_newmsg(num,false);
        //Assig buffer to chat view 
        if(num!=m_current_buffer) {
            auto chat =  win.win<gui::chat_view>(win_view);
@@ -310,9 +310,10 @@ void tele_app::on_new_message(std::int64_t id, std::int64_t msgid, std::string_v
     auto chat = find_chat(id); 
     chat.first->add_line(!chat.second?("[" + std::to_string(id)+"] [" + std::string(name)+ "]: "s + std::string(msg)):msg,outgoing);
     chat.first->last_message_id(msgid);
+    const auto nid = find_existing_chat(id);
     auto& win = gui::window_manager::get();
     if(m_current_buffer==chat.second) m_tcli->view_message(id,msgid);
-    else win.win<gui::status_bar>(win_status)->set_newmsg(id,true);
+    else win.win<gui::status_bar>(win_status)->set_newmsg(nid>0?nid:0,true);
     win.repaint();
 } 
 
@@ -367,7 +368,7 @@ int tele_app::on_new_chat_create(const CppReadline::Console::Arguments& args)
         const auto title = m_tcli->get_chat_title(chat_id);
         m_chats[nid] = gui::chat_doc::clone(chat_id,title);
         auto swin = win.win<gui::status_bar>(win_status);
-        swin->add_user(chat_id,title);
+        swin->add_user(nid,title);
         control_message_nlock("Chat: " + std::to_string(chat_id) + " opened at slot F" + std::to_string(nid+1));
         win.repaint();
     });
@@ -454,7 +455,7 @@ void tele_app::restore_opened_buffers()
             const auto title = m_tcli->get_chat_title(chat.second);
             m_chats[chat.first] = gui::chat_doc::clone(chat.second,title);
             auto swin = win.win<gui::status_bar>(win_status);
-            swin->add_user(chat.second,title);
+            swin->add_user(chat.first,title);
             control_message_nlock("Chat: " + std::to_string(chat.second)
                  + " opened at slot F" + std::to_string(chat.first+1));
             win.repaint();
