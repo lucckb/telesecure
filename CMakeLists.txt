@@ -8,7 +8,7 @@ find_package(Curses REQUIRED)
 find_package(Readline REQUIRED)
 
 #Boost header only
-find_package(Boost 1.72.0)
+find_package(Boost COMPONENTS system filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
 
@@ -37,4 +37,5 @@ target_include_directories( ${PROJECT_NAME} PRIVATE ${NCURSES_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE Td::TdStatic)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CURSES_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${Readline_LIBRARY})
-
+target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_FILESYSTEM_LIBRARY})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_SYSTEM_LIBRARY})
