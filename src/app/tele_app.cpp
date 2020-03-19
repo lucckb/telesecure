@@ -397,7 +397,7 @@ int tele_app::on_new_chat_delete(const CppReadline::Console::Arguments& args)
     }
     on_switch_buffer_nolock(0);
     auto& win = gui::window_manager::get();
-    win.win<gui::status_bar>(win_status)->del_user(chat_id);
+    win.win<gui::status_bar>(win_status)->del_user(ord);
     m_chats[ord].reset();
     return CppReadline::Console::ReturnCode::Ok;
 }
