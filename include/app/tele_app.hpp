@@ -43,7 +43,9 @@ namespace app {
          //Restore last buffers
         void restore_opened_buffers();
         //On user start or stop typing
-        void on_user_typing(std::int64_t id, bool typing );
+        void on_user_typing( std::int64_t id, bool typing );
+        //Set online status 
+        void set_online_status( std::int64_t id, bool online);
     private:
         //Initialize GUI
         void init_gui();

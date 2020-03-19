@@ -3,6 +3,7 @@
 #include <chrono>
 #include <string>
 #include <gui/utility.hpp>
+ 
 
 /** Use openChat/closeChat class for read acknowledgement
     * https://github.com/tdlib/td/issues/46
@@ -173,6 +174,20 @@ void telegram_cli::process_update(td_api::object_ptr<td_api::Object> update)
                             }
                             m_action_state[user_id] = 0;
                          }
+                     },
+                     [this](td_api::updateUserStatus& update_user_status) {
+                        const auto user_id = update_user_status.user_id_;
+                        switch(update_user_status.status_->get_id()) {
+                        case td_api::userStatusOnline::ID:
+                            m_app.set_online_status(user_id,true);
+                            break;
+                        case td_api::userStatusEmpty::ID:
+                        case td_api::userStatusRecently::ID:
+                        case td_api::userStatusOffline::ID:
+                        case td_api::userStatusLastWeek::ID:
+                        case td_api::userStatusLastMonth::ID:
+                            m_app.set_online_status(user_id,false);
+                        }
                      },
                      [](auto &update) {})); 
 }

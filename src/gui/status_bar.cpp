@@ -86,11 +86,11 @@ void status_bar::set_newmsg( int id, bool newmsg )
 }
 
 //Set message online
-void status_bar::set_typing( int id, bool online )
+void status_bar::set_typing( int id, bool typing )
 {
     const auto it = m_users.find(id);
     if( it != m_users.end() ) {
-        it->second.online = online;
+        it->second.typing = typing;
        changed(true);
     }
 }

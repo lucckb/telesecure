@@ -507,5 +507,17 @@ void tele_app::on_user_typing(std::int64_t id, bool typing)
     }
 }
 
+//Set online status   
+void tele_app::set_online_status( std::int64_t id, bool online)
+{
+    std::unique_lock _lck(m_mtx);
+    const auto nid = find_existing_chat(id);
+    if(nid>=0) { //Handle message only when is visible
+        auto& win = gui::window_manager::get();
+        win.win<gui::status_bar>(win_status)->set_online(nid,online);
+        win.repaint();
+    }
+}
+
 }
 
