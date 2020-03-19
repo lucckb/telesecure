@@ -399,6 +399,8 @@ int tele_app::on_new_chat_delete(const CppReadline::Console::Arguments& args)
     auto& win = gui::window_manager::get();
     win.win<gui::status_bar>(win_status)->del_user(ord);
     m_chats[ord].reset();
+    control_message_nlock("Chat: " + std::to_string(chat_id) + " deleted from slot F" + std::to_string(ord+1));
+    win.repaint();
     return CppReadline::Console::ReturnCode::Ok;
 }
 
