@@ -95,7 +95,7 @@ void tele_app::init_input()
             }
         }
     });
-    //Wgen prev arrow is pressed
+    //When prev arrow is pressed
     inp.register_switch_left( [&]() {
         std::unique_lock _lck(m_mtx);
         for(int i=m_current_buffer-1;i>=0;--i) {
@@ -106,6 +106,21 @@ void tele_app::init_input()
             }
         }
     });
+    //Register page up event
+    inp.register_pageup_cb([this]() {
+        std::unique_lock _lck(m_mtx);
+        auto& win = gui::window_manager::get();
+        win.win<gui::chat_view>(win_view)->scrolling(gui::chat_view::scroll_mode::up);
+        win.repaint();
+    });
+     //Register page up event
+    inp.register_pagedn_cb([this]() {
+        std::unique_lock _lck(m_mtx);
+        auto& win = gui::window_manager::get();
+        win.win<gui::chat_view>(win_view)->scrolling(gui::chat_view::scroll_mode::down);
+        win.repaint();
+    });
+
 }
 
 // Run main handler

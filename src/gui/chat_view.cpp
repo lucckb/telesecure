@@ -44,19 +44,21 @@ bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
     if( m_view && (changed()||m_view->changed()) ) {
         auto win = ctx.win();
         int maxx,maxy;
-        const auto items = m_view->items();
         getmaxyx(win,maxy,maxx);
         curs_set(0);
         //Calculate lines from the end
+        const auto begin = m_view->begin();
+        const auto end = m_view->end();
         const int hdrsiz = utf8_strlen(m_view->who()) + c_date_siz + c_hdr_siz;
-        auto i = items.end(); --i;
-        for (int nlines=0;i!=items.begin(); --i) { 
+        auto i = end; 
+        if(i!=begin) --i;
+        for (int nlines=0;i!=begin; --i) { 
             nlines += linecount(i->line,maxx,hdrsiz);
             if(nlines>=maxy) break;
         }
         wclear(win);
         scrollok(win, TRUE);
-        for (;i!=items.end(); ++i) {
+        for (;i!=end; ++i) {
             std::string who;
             if(!i->outgoing) {   //Is Sender
                 setcolor(win,fgcolor(),bgcolor());
@@ -79,6 +81,17 @@ void chat_view::set_view(std::shared_ptr<chat_doc> view)
 {
     wclear(ctx().win());
     m_view = view;
+    changed(true);
+}
+
+//Scroll up
+void chat_view::scrolling(scroll_mode mode)
+{
+    auto win = ctx().win();
+    int maxx,maxy;
+    getmaxyx(win,maxy,maxx);
+    maxy = maxy-1;
+    m_view->rewind(mode==scroll_mode::up?-maxy:maxy);
     changed(true);
 }
 

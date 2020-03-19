@@ -7,6 +7,7 @@ namespace gui {
 
     class chat_view final : public window {
     public:
+        enum class scroll_mode { up, down };
         //! Construtor
         chat_view( color_t bg, color_t fb );
         //! Destructor
@@ -17,11 +18,11 @@ namespace gui {
         }
         //Assign view to the container
         void set_view( std::shared_ptr<chat_doc> view);
+        //Scroll up
+        void scrolling(scroll_mode mode);
     protected:
          // Do draw screen function
         bool do_draw_screen(detail::window_driver_context& ctx) override;
-        //On create
-        //void on_create(detail::window_driver_context& ctx) override;
     private:
         std::shared_ptr<chat_doc> m_view;
     };

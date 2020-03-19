@@ -30,9 +30,8 @@ namespace gui {
         }
         //Add single line
         void add_line(std::string_view line, bool outgoing=false);
-         const auto& items() const noexcept {
-            return m_items;
-        }
+        //Paging up or down
+        void rewind( int nlines );
         //Get identifier
         auto id() const {
             return m_id;
@@ -55,6 +54,13 @@ namespace gui {
         //Mark when displayed on screen
         void displayed() noexcept {
             m_changed = false;
+        }
+        //Get current item
+        auto end() const noexcept {
+            return m_curr_line;
+        }
+        auto begin() const noexcept {
+            return m_items.begin();
         }
     private:
         std::list<item> m_items;
