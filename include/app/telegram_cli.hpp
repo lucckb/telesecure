@@ -104,9 +104,11 @@ namespace app {
         using users_t = std::map<std::int32_t, td::td_api::object_ptr<td::td_api::user>>;
         using chat_title_t = std::map<std::int64_t, std::string>;
         using authorization_state_t = td::td_api::object_ptr<td::td_api::AuthorizationState>;
+        using user_action_state_t = std::map<std::int64_t, int>;
         handlers_t m_handlers;
         users_t m_users;
         chat_title_t m_chat_title;
+        user_action_state_t m_action_state;
         authorization_state_t m_authorization_state;
         std::uint64_t m_current_query_id {};
         std::uint64_t m_authentication_query_id {};

@@ -161,7 +161,20 @@ void telegram_cli::process_update(td_api::object_ptr<td_api::Object> update)
                          }
                          m_app.on_new_message(chat_id, msg_id, sender_user_name, text,outgoing);
                      },
-                     [](auto &update) {}));
+                     [this](td_api::updateUserChatAction &chat_action) {
+                         const auto action_id = chat_action.action_->get_id();
+                         const auto user_id = chat_action.user_id_;
+                         if(action_id==td_api::chatActionTyping::ID ) {
+                            m_action_state[user_id] = action_id; 
+                            m_app.on_user_typing(user_id,true);
+                         } else if(action_id==td_api::chatActionCancel::ID) {
+                            if(m_action_state[user_id]==td_api::chatActionTyping::ID) {
+                                m_app.on_user_typing(user_id,false);
+                            }
+                            m_action_state[user_id] = 0;
+                         }
+                     },
+                     [](auto &update) {})); 
 }
 
 // Authorization state update

@@ -495,6 +495,17 @@ void tele_app::on_leave_session()
     gui::window_manager::get().repaint();
 }
 
+//On user start or stop typing
+void tele_app::on_user_typing(std::int64_t id, bool typing)
+{
+    std::unique_lock _lck(m_mtx);
+    const auto nid = find_existing_chat(id);
+    if(nid>=0) { //Handle message only when is visible
+        auto& win = gui::window_manager::get();
+        win.win<gui::status_bar>(win_status)->set_typing(nid,typing);
+        win.repaint();
+    }
 }
 
- 
+}
+

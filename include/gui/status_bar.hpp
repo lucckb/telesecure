@@ -16,8 +16,9 @@ namespace gui {
             {
             }
             std::string username;   //Telegram user name
-            bool online;            //Is online
-            bool newmsg;            //Got new msg
+            bool online {};            //Is online
+            bool newmsg {};            //Got new msg
+            bool typing {};            //Is typing
         };
     public: 
         //Create new object instance
@@ -30,20 +31,22 @@ namespace gui {
         //Destructor
         virtual ~status_bar();
         //Add newuser to watch list
-        void add_user( id_t id, std::string_view name );
+        void add_user( int id, std::string_view name );
         //Del user from watch list
-        void del_user( id_t id );
+        void del_user( int id );
         //Set user online
-        void set_online( id_t id, bool online );
+        void set_online( int id, bool online );
         //New msg received
-        void set_newmsg( id_t id, bool newmsg );
+        void set_newmsg( int id, bool newmsg );
+        //Set is typing
+        void set_typing( int id, bool typing );
         //Set status active
-        void set_active( id_t id );
+        void set_active( int id );
     protected:
         // Do draw screen function
         bool do_draw_screen( detail::window_driver_context& ctx ) override;
     private:
-        std::map<id_t,item> m_users;
-        id_t m_active {};
+        std::map<int,item> m_users;
+        int m_active {};
     };
 }
