@@ -73,7 +73,7 @@ bool edit_box::do_draw_screen( detail::window_driver_context& ctx )
         if(m_delchar) {
             m_delchar = false;
             wclear(win);
-            wprintw(win,m_line.c_str());
+            waddstr(win,m_line.c_str());
         } else {
             waddstr(win,m_char.c_str());
         }
