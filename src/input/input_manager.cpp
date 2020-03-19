@@ -159,7 +159,10 @@ bool input_manager::normal_mode()
         //Leave temporary
         case CTRL('p'):
             m_leave_cb(); 
-            break;  
+            break;
+        case CTRL('a'):
+            m_clearedit_cb();
+            break;
         // Switch data buffer
         case KEY_F(1)...KEY_F(12):
            m_switch_window_cb(ch-KEY_F(1));

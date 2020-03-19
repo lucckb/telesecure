@@ -120,7 +120,13 @@ void tele_app::init_input()
         win.win<gui::chat_view>(win_view)->scrolling(gui::chat_view::scroll_mode::down);
         win.repaint();
     });
-
+    //Register clear edit callback
+    inp.register_clear_edit_cb([this]() { 
+        std::unique_lock _lck(m_mtx);
+        auto& win = gui::window_manager::get();
+        win.win<gui::edit_box>(win_edit)->clear();
+        win.repaint();
+    });
 }
 
 // Run main handler

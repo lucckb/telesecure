@@ -57,6 +57,10 @@ namespace input {
         void register_pagedn_cb( std::function<void()> cb ) noexcept {
             m_pagedn_cb = cb;
         }
+        //Register clear edit callback
+        void register_clear_edit_cb( std::function<void()> cb ) noexcept {
+            m_clearedit_cb = cb;
+        }
         //Handle input loop
         void loop();
     private:
@@ -77,6 +81,7 @@ namespace input {
         std::function<void(char)> m_readline_cb;
         std::function<void()> m_pageup_cb;
         std::function<void()> m_pagedn_cb;
+        std::function<void()> m_clearedit_cb;
         bool m_forward_readline {};
     };
 }
