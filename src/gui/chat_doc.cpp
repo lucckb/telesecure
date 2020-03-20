@@ -1,5 +1,5 @@
 #include <gui/chat_doc.hpp>
-
+#include <gui/utility.hpp>
 
 namespace gui
 {
@@ -33,20 +33,36 @@ void chat_doc::add_line(std::string_view line, bool outgoing)
 void chat_doc::rewind( int nlines )
 {
     if(nlines>0) {
-      //Not enough
-      const auto diff = std::distance(m_curr_line,m_items.end());
-      if( diff < nlines ) {
-        return;
-      }
-      for(;m_curr_line!=m_items.end()&&nlines>0;++m_curr_line,--nlines) {}
+        //Now we need to check after split all needed
+        int virt_lines {};
+        int real_lines {};
+        for( auto it=m_curr_line; it!=m_items.end(); ++it ) {
+            virt_lines += split_string(it->first,m_maxx).size();
+            ++real_lines;
+            if(virt_lines>=nlines) break;
+        }
+        if( virt_lines < nlines ) {
+          //return;
+        }
+        for(;m_curr_line!=m_items.end()&&real_lines>0;++m_curr_line,--real_lines) {}
     } else if(nlines<0) {
-      nlines = -nlines;
-      // Not enough
-      const auto diff = std::distance(m_items.begin(),m_curr_line);
-      if( diff < nlines ) {
-        return;
-      }
-      for(;m_curr_line!=m_items.begin()&&nlines>0;--m_curr_line,--nlines) {}
+        nlines = -nlines;
+         //Now we need to check after split all needed
+        int virt_lines {};
+        int real_lines {};
+        for( auto it=m_curr_line; it!=m_items.begin();) {
+            --it;
+            virt_lines += split_string(it->first,m_maxx).size();
+            ++real_lines;
+            if(virt_lines>=nlines) break;
+        }
+        if( virt_lines < nlines ) {
+            return;
+        }
+        for(;m_curr_line!=m_items.begin()&&real_lines>0; --real_lines) {
+            --m_curr_line;
+        }
+
     }
     m_changed = true;
 }

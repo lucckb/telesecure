@@ -2,6 +2,7 @@
 #include <curses.h>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace gui 
 {
@@ -49,12 +50,9 @@ namespace gui
     void pop_utf8(std::string& x);
     //! Utf8 strlen
     std::size_t utf8_strlen(std::string_view str);
-    //! Text wrap
-    std::string text_wrap(std::string str, std::size_t location);
+    //! Split string into words
+    std::vector<std::string> split_string(const std::string& str, std::size_t max);
 
 }
-namespace util {
- //! Get home directory
-    std::string home_dir();
-}
+
 

@@ -50,6 +50,9 @@ namespace gui {
         auto begin() const noexcept {
             return m_items.begin();
         }
+        void maxx(int max_) noexcept {
+            m_maxx = max_;
+        }
     private:
         std::list<std::pair<std::string,bool>> m_items;
         std::list<std::pair<std::string,bool>>::iterator m_curr_line { m_items.end() };
@@ -57,5 +60,6 @@ namespace gui {
         const id_t m_id;
         id_t m_last_msg_id;
         bool m_changed { true };
+        int m_maxx {  };  //Maximum x for the screen
     };
 }

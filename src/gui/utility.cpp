@@ -1,9 +1,8 @@
 #include <gui/utility.hpp>
 #include <curses.h>
 #include <string>
-#include <sys/types.h>
-#include <pwd.h>
-#include <unistd.h>
+#include <sstream>
+
 
 namespace gui {
 
@@ -93,46 +92,20 @@ void pop_utf8(std::string& x) {
     x.pop_back();
 }
 
-std::size_t utf8_strlen(std::string_view str)
+std::vector<std::string> split_string(const std::string& str, std::size_t max) 
 {
-    int c,i,ix,q;
-    if(str.empty()) return 0;
-    for (q=0, i=0, ix=str.length(); i < ix; i++, q++)
-    {
-        c = (unsigned char) str[i];
-        if      (c>=0   && c<=127) i+=0;
-        else if ((c & 0xE0) == 0xC0) i+=1;
-        else if ((c & 0xF0) == 0xE0) i+=2;
-        else if ((c & 0xF8) == 0xF0) i+=3;
-        else if ((c & 0xFC) == 0xF8) i+=4; 
-        else if ((c & 0xFE) == 0xFC) i+=5;
-        else return 0;//invalid utf8
-    }
-    return q;
-}
-
-std::string text_wrap(std::string str, std::size_t location) 
-{
-    // your other code
-    int n = str.rfind(' ', location);
-    if (n != std::string::npos) {
-        str.at(n) = '\n';
-    }
-    // your other code
-    return str;
+        std::vector<std::string> output;
+        std::istringstream iss(str);
+	    std::string word;
+        while((iss >> word)) {	
+	        // Check if the last element can still hold another word (+ space)
+	        if (output.size() > 0 && (output[output.size() - 1].size() + word.size() + 1) <= max)
+	            output[output.size() - 1] += ' ' + word;
+	        else        
+	            output.push_back(word);
+	    }
+        return output;
 }
 
 
-}
-
-namespace util {
-// Get home directory
-std::string home_dir() 
- {
-    const char *homedir;
-    if ((homedir = getenv("HOME")) == nullptr) {
-        homedir = getpwuid(getuid())->pw_dir;
-    }   
-    return homedir;
-}
 }

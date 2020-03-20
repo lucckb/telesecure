@@ -2,6 +2,7 @@
 #include <app/tele_app.hpp>
 #include <chrono>
 #include <string>
+#include <util.hpp>
 #include <gui/utility.hpp>
  
 

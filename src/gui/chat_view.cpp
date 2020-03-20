@@ -1,18 +1,12 @@
 #include <gui/chat_view.hpp>
 #include <gui/chat_doc.hpp>
 #include <gui/window_driver_context.hpp>
+#include <gui/utility.hpp>
 #include <ctime>
 
-namespace gui {
 
-namespace {
+namespace gui {
    
-    std::size_t linecount(std::string_view str, std::size_t maxx)
-    {
-        const int slen = utf8_strlen(str);
-        return slen/maxx + !!(slen%maxx);
-    }
-}
 
 //! Construtor
 chat_view::chat_view(color_t bg, color_t fg)
@@ -29,6 +23,11 @@ chat_view::~chat_view()
 bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
 {
     if(m_view) {
+        int y,x;
+        getmaxyx(ctx.win(),y,x);
+        m_view->maxx(x);
+    }
+    if(m_view) {
         changed( changed()| m_view->changed() );
         m_view->displayed();
     }
@@ -39,24 +38,25 @@ bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
         getmaxyx(win,maxy,maxx);
         curs_set(0);
         //Calculate lines from the end
-        const auto begin = m_view->begin();
-        const auto end = m_view->end();
-        auto i = end; 
-        if(i!=begin) --i;
-        for (int nlines=0;i!=begin; --i) { 
-            nlines += linecount(i->first,maxx);
-            if(nlines>=maxy) break;
-        }
+        const auto begin = std::make_reverse_iterator(m_view->end());
+        const auto end = std::make_reverse_iterator(m_view->begin());
         wclear(win);
         scrollok(win, TRUE);
-        for (;i!=end; ++i) {
+        int curr_y = maxy-1;
+        for (auto i=begin;i!=end; ++i) {
             if(!i->second) {   //Is Sender
                 setcolor(win,fgcolor(),bgcolor());
             } else {    //Im not sender
                 setcolor(win,color_t::blue,bgcolor());
             }
-            waddstr(win,i->first.c_str());
-            waddch(win,'\n');
+            const auto real_lines = split_string(i->first,maxx);
+            const auto rls = real_lines.size();
+            const auto start_ln = curr_y - rls;
+            for(int y=start_ln,n=0; n<rls ;++n,++y) {
+                mvwaddstr(win,y,0,(real_lines[n]+"\n").c_str());
+            }
+            curr_y -= rls;
+            if(curr_y<=0) break;
         }
         scrollok(win, FALSE);
         curs_set(2);

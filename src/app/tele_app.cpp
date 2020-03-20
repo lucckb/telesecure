@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <gui/utility.hpp>
 #include <boost/process.hpp>
+#include <util.hpp>
 
 
 namespace app {
