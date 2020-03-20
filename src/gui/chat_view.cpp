@@ -6,16 +6,10 @@
 namespace gui {
 
 namespace {
-    std::string time2str(std::time_t tim)
+   
+    std::size_t linecount(std::string_view str, std::size_t maxx)
     {
-        char buf[32] {};
-        auto tm = std::localtime(&tim);
-        std::snprintf(buf,sizeof buf,"%02i:%02i",tm->tm_hour,tm->tm_min);
-        return buf;
-    }
-    std::size_t linecount(std::string_view str, std::size_t maxx, std::size_t extra=0)
-    {
-        const int slen = utf8_strlen(str) + extra;
+        const int slen = utf8_strlen(str);
         return slen/maxx + !!(slen%maxx);
     }
 }
@@ -34,8 +28,6 @@ chat_view::~chat_view()
 //When screen should be redrawed
 bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
 {
-    constexpr auto c_date_siz = 5;
-    constexpr auto c_hdr_siz = 2;
     if(m_view) {
         changed( changed()| m_view->changed() );
         m_view->displayed();
@@ -49,25 +41,22 @@ bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
         //Calculate lines from the end
         const auto begin = m_view->begin();
         const auto end = m_view->end();
-        const int hdrsiz = utf8_strlen(m_view->who()) + c_date_siz + c_hdr_siz;
         auto i = end; 
         if(i!=begin) --i;
         for (int nlines=0;i!=begin; --i) { 
-            nlines += linecount(i->line,maxx,hdrsiz);
+            nlines += linecount(i->first,maxx);
             if(nlines>=maxy) break;
         }
         wclear(win);
         scrollok(win, TRUE);
         for (;i!=end; ++i) {
-            std::string who;
-            if(!i->outgoing) {   //Is Sender
+            if(!i->second) {   //Is Sender
                 setcolor(win,fgcolor(),bgcolor());
-                who = m_view->who();
             } else {    //Im not sender
                 setcolor(win,color_t::blue,bgcolor());
-                who = "Me";
             }
-            wprintw(win,"%s@%s> %s\n",who.c_str(),time2str(i->time).c_str(),i->line.c_str());
+            waddstr(win,i->first.c_str());
+            waddch(win,'\n');
         }
         scrollok(win, FALSE);
         curs_set(2);

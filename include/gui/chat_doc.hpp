@@ -11,14 +11,6 @@ namespace gui {
     //Chat document
     class chat_doc {
         static const auto maxnlines = 1000;
-        struct item {
-            item( std::string_view _line, bool _outgoing)
-                : time(std::time(nullptr)),line(_line),outgoing(_outgoing)
-            {}
-            std::time_t time;
-            std::string line;
-            bool outgoing;
-        };
      public:
         //! Set owner
         chat_doc(id_t id, std::string_view who)
@@ -35,10 +27,6 @@ namespace gui {
         //Get identifier
         auto id() const {
             return m_id;
-        }
-        // Get who identifier
-        auto who() const {
-            return m_who;
         }
         //Set and get last message ID
         auto last_message_id() const noexcept {
@@ -63,8 +51,8 @@ namespace gui {
             return m_items.begin();
         }
     private:
-        std::list<item> m_items;
-        std::list<item>::iterator m_curr_line { m_items.end() };
+        std::list<std::pair<std::string,bool>> m_items;
+        std::list<std::pair<std::string,bool>>::iterator m_curr_line { m_items.end() };
         const std::string m_who;
         const id_t m_id;
         id_t m_last_msg_id;
