@@ -98,7 +98,7 @@ bool input_manager::readline_mode()
            break;
         //Handle fn keypad manually
         case key::escape: {
-           char buf[16];
+           char buf[16] {};
            const auto n = read_multichars(buf,sizeof buf);
            //Switch buffer handle
            for(int i=0;i<keytab_sz;i++) {
