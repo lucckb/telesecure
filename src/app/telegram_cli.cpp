@@ -92,6 +92,7 @@ void telegram_cli::client_thread()
                 process_response(std::move(response));
             }
         }
+        update_is_typing_status();
     }
 }
 
@@ -133,11 +134,12 @@ void telegram_cli::process_update(td_api::object_ptr<td_api::Object> update)
     td_api::downcast_call(
         *update, overloaded(
                      [this](td_api::updateAuthorizationState &update_authorization_state) {
-                         m_authorization_state = std::move(update_authorization_state.authorization_state_);
-                         on_authorization_state_update();
+                        m_authorization_state = std::move(update_authorization_state.authorization_state_);
+                        on_authorization_state_update();
                      },
                      [this](td_api::updateNewChat &update_new_chat) {
-                         m_chat_title[update_new_chat.chat_->id_] = update_new_chat.chat_->title_;
+                        m_chat_title[update_new_chat.chat_->id_] = update_new_chat.chat_->title_;
+                        m_chat_typing[update_new_chat.chat_->id_] = std::make_pair(std::chrono::steady_clock::now(),false);
                      },
                      [this](td_api::updateChatTitle &update_chat_title) {
                          m_chat_title[update_chat_title.chat_id_] = update_chat_title.title_;
@@ -353,6 +355,36 @@ void telegram_cli::send_message_to(std::int64_t id, std::string_view msg)
     message_content->text_->text_ = std::move(msg);
     send_message->input_message_content_ = std::move(message_content);
     send_query(std::move(send_message), {});
+}
+
+//Update typing
+void telegram_cli::update_typing_chat(std::int64_t chat_id)
+{
+    const auto now = std::chrono::steady_clock::now();
+    if(!m_chat_typing[chat_id].second) {
+        m_chat_typing[chat_id] = std::make_pair(now,true);
+        auto typing_obj = td_api::make_object<td_api::chatActionTyping>();
+        auto chat_action_obj = td_api::make_object<td_api::sendChatAction>(chat_id,std::move(typing_obj));
+        send_query(std::move(chat_action_obj),{});
+    }
+}
+
+// Update is typing status
+void telegram_cli::update_is_typing_status()
+{
+    const auto end = std::chrono::steady_clock::now();
+    for( auto& ts: m_chat_typing ) {
+        using namespace std::chrono_literals;
+        const auto diff = end - ts.second.first;
+        if(diff>5s && ts.second.second) {
+            //Send action event
+            auto typing_obj = td_api::make_object<td_api::chatActionCancel>();
+            auto chat_action_obj = td_api::make_object<td_api::sendChatAction>(ts.first,std::move(typing_obj));
+            send_query(std::move(chat_action_obj),{});
+            //Update variable
+            ts.second.second = false;
+        }
+    }
 }
 
 } // namespace app

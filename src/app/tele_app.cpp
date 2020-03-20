@@ -62,6 +62,9 @@ void tele_app::init_input()
         std::unique_lock _lck(m_mtx);
         win.win<gui::edit_box>(win_edit)->add_new_char(ch);
         win.repaint();
+        if(m_current_buffer!=0) {   //When the chat is selected
+            m_tcli->update_typing_chat(m_chats[m_current_buffer]->id());
+        }
    });
     inp.register_delete_char([&](){
         std::unique_lock _lck(m_mtx);

@@ -7,6 +7,7 @@
 #include <thread>
 #include <atomic>
 #include <map>
+#include <chrono>
 
 namespace app {
     class tele_app;
@@ -72,6 +73,8 @@ namespace app {
         }
         //Send message to the selected chat client
         void send_message_to(std::int64_t id, std::string_view msg);
+        //Update typing
+        void update_typing_chat(std::int64_t chat_id);
     private:
         //Telegram main client thread
         void client_thread();
@@ -93,6 +96,8 @@ namespace app {
         }
         // Get user name
         std::string get_user_name(std::int32_t user_id);
+        // Update is typing status
+        void update_is_typing_status();
     private:
         tele_app& m_app;
         std::unique_ptr<td::Client> m_client;
@@ -105,9 +110,11 @@ namespace app {
         using chat_title_t = std::map<std::int64_t, std::string>;
         using authorization_state_t = td::td_api::object_ptr<td::td_api::AuthorizationState>;
         using user_action_state_t = std::map<std::int64_t, int>;
+        using chat_last_typing_t = std::map<std::int64_t, std::pair<std::chrono::time_point<std::chrono::steady_clock>,bool>>;
         handlers_t m_handlers;
         users_t m_users;
         chat_title_t m_chat_title;
+        chat_last_typing_t m_chat_typing;
         user_action_state_t m_action_state;
         authorization_state_t m_authorization_state;
         std::uint64_t m_current_query_id {};
