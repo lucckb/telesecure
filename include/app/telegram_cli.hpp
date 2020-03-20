@@ -8,6 +8,7 @@
 #include <atomic>
 #include <map>
 #include <chrono>
+#include <shared_mutex>
 
 namespace app {
     class tele_app;
@@ -119,5 +120,6 @@ namespace app {
         authorization_state_t m_authorization_state;
         std::uint64_t m_current_query_id {};
         std::uint64_t m_authentication_query_id {};
+        std::shared_mutex m_typing_lock;
     };
 };

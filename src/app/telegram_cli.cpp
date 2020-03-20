@@ -360,6 +360,7 @@ void telegram_cli::send_message_to(std::int64_t id, std::string_view msg)
 //Update typing
 void telegram_cli::update_typing_chat(std::int64_t chat_id)
 {
+    std::unique_lock _lck(m_typing_lock);
     const auto now = std::chrono::steady_clock::now();
     if(!m_chat_typing[chat_id].second) {
         m_chat_typing[chat_id] = std::make_pair(now,true);
@@ -373,6 +374,7 @@ void telegram_cli::update_typing_chat(std::int64_t chat_id)
 void telegram_cli::update_is_typing_status()
 {
     const auto end = std::chrono::steady_clock::now();
+    std::unique_lock _lck(m_typing_lock);
     for( auto& ts: m_chat_typing ) {
         using namespace std::chrono_literals;
         const auto diff = end - ts.second.first;
