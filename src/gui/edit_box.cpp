@@ -4,6 +4,7 @@
 #include <wchar.h>
 #include <wctype.h>
 #include <cstring>
+#include <readline/readline.h>
 
 namespace gui {
 
@@ -66,6 +67,16 @@ edit_box::~edit_box()
 
 //! Draw screen
 bool edit_box::do_draw_screen( detail::window_driver_context& ctx )
+{
+    if(m_readline_mode) {
+        on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
+        return true;
+    } else {
+        return draw_screen(ctx);
+    }
+}
+//! Draw screen 2
+bool edit_box::draw_screen(detail::window_driver_context& ctx)
 {
     auto ret {changed()};
     if(changed()) {      

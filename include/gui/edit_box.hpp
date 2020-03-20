@@ -26,11 +26,19 @@ namespace gui {
         std::string_view line() const noexcept {
             return m_line;
         }
+        //Configure readline mode
+        void readline_mode(bool en) noexcept {
+            m_readline_mode = en;
+        }
+    private:
+        //Drw screen without readline mode
+        bool draw_screen(detail::window_driver_context& ctx);
         //Special function in readline mode
         void on_readline_handle(const char* prompt, const char* linebuf, int point);
     private:
         std::string m_char {};
         bool m_addchar {};
         std::string m_line;
+        bool m_readline_mode {};
     };
 }

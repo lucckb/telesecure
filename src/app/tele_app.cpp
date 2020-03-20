@@ -5,7 +5,6 @@
 #include <gui/status_bar.hpp>
 #include <gui/chat_view.hpp>
 #include <gui/chat_doc.hpp>
-#include <readline/readline.h>
 #include <app/telegram_cli.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -70,17 +69,18 @@ void tele_app::init_input()
     inp.register_line_completed(std::bind(&tele_app::on_line_completed,this));
     inp.register_switch_window(std::bind(&tele_app::on_switch_buffer,this,std::placeholders::_1));
     inp.forward_to_readline(true);
+    win.win<gui::edit_box>(win_edit)->readline_mode(true);
     //Readline refresh added
     m_console->registerRedisplayCommand([&]() {
         std::unique_lock _lck(m_mtx);
-        win.win<gui::edit_box>(win_edit)->on_readline_handle(rl_display_prompt,rl_line_buffer,rl_point);
+        win.repaint();
     });
     //Readline callback bind function
     inp.register_readline_callback(
         std::bind(&CppReadline::Console::forwardToReadline,
         std::ref(m_console),std::placeholders::_1)
     );
-    //When readline option completed
+    //When readline option completed 
     m_console->registerCommandCompleted(
         std::bind(&tele_app::on_readline_completed, this, std::placeholders::_1)
     );
@@ -141,10 +141,9 @@ void tele_app::run()
     auto& win = gui::window_manager::get();
     //Create windows
     win.create_all();
-    win.repaint();
     //Initial configuration
-    win.win<gui::edit_box>(win_edit)->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
     win.win<gui::chat_view>(win_view)->set_view(m_chats[0]);
+    win.repaint();
     //Start telegram client
     m_tcli->start();
     //Start input main loop
@@ -175,6 +174,7 @@ void tele_app::on_switch_buffer_nolock(int num)
        auto swin = win.win<gui::status_bar>(win_status);
        auto edit = win.win<gui::edit_box>(win_edit);
        input::input_manager::get().forward_to_readline(num==0);
+       edit->readline_mode(num==0);
        swin->set_active(num);
        swin->set_newmsg(num,false);
        //Assig buffer to chat view 
@@ -186,9 +186,6 @@ void tele_app::on_switch_buffer_nolock(int num)
                 m_tcli->view_message( m_chats[num]->id(), m_chats[num]->last_message_id());
            }
            edit->clear();
-           if(num==0) {
-                edit->on_readline_handle(rl_display_prompt, rl_line_buffer,rl_point);
-           }
        }
        m_current_buffer = num;
     }
