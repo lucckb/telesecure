@@ -90,7 +90,7 @@ bool input_manager::readline_mode()
             return true;
         //Leave temporary
         case CTRL('p'):
-            m_leave_cb(); 
+            m_leave_cb();
             break;  
         // Switch data buffer
         case KEY_F(1)...KEY_F(12):

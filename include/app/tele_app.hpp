@@ -80,6 +80,7 @@ namespace app {
         std::vector<std::pair<int,long>> read_config();
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
+        std::array<std::shared_ptr<std::string>,num_chats> m_edit_lines;
         int m_current_buffer {};
         std::unique_ptr<CppReadline::Console> m_console;
         const std::unique_ptr<telegram_cli> m_tcli;

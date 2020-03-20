@@ -24,6 +24,9 @@ namespace {
 tele_app::tele_app()
     : m_tcli(new telegram_cli(*this))
 {
+    for( auto& e : m_edit_lines ) {
+        e = std::make_shared<std::string>();
+    }
 }
 
 //Destructor
@@ -185,7 +188,7 @@ void tele_app::on_switch_buffer_nolock(int num)
            if(num!=0 || num!=num_chats-1) {
                 m_tcli->view_message( m_chats[num]->id(), m_chats[num]->last_message_id());
            }
-           edit->clear();
+           edit->set_line(m_edit_lines[num]);
        }
        m_current_buffer = num;
     }

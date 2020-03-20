@@ -79,6 +79,7 @@ bool edit_box::do_draw_screen( detail::window_driver_context& ctx )
 bool edit_box::draw_screen(detail::window_driver_context& ctx)
 {
     auto ret {changed()};
+    if(!m_line) return false;
     if(changed()) {      
         auto win = ctx.win();
         if(m_addchar) {
@@ -86,7 +87,7 @@ bool edit_box::draw_screen(detail::window_driver_context& ctx)
             m_addchar = false;
         } else {
             wclear(win);
-            waddstr(win,m_line.c_str());
+            waddstr(win,m_line->c_str());
         } 
     } else {
         ret = true;
@@ -103,24 +104,33 @@ void edit_box::on_create(detail::window_driver_context& ctx)
 //Add new character to the string
 void edit_box::add_new_char( std::string_view ch )
 {
+    if(!m_line) {
+        throw std::logic_error("Null pointer exception");
+    } 
     m_char = ch;
     changed(true);
-    m_line += ch;
+    *m_line += ch;
     m_addchar = true;
 }
 
  //Delete char at cursor
 void edit_box::del_char()
 {
+    if(!m_line) {
+        throw std::logic_error("Null pointer exception");
+    } 
     changed(true);
-    pop_utf8(m_line);
+    pop_utf8(*m_line);
 }
 
 // Clear buffer 
 void edit_box::clear()
 {
+    if(!m_line) {
+        throw std::logic_error("Null pointer exception");
+    } 
     changed(true);
-    m_line.clear();
+    m_line->clear();
 }
 
 // Readline handle outside the readline

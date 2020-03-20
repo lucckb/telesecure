@@ -23,12 +23,20 @@ namespace gui {
         void del_char();
         // Clear buffer 
         void clear();
-        std::string_view line() const noexcept {
-            return m_line;
+        std::string_view line() const {
+            if(!m_line) {
+                throw std::logic_error("Null pointer exception");
+            }
+            return *m_line;
         }
         //Configure readline mode
         void readline_mode(bool en) noexcept {
             m_readline_mode = en;
+        }
+        // Set line
+        void set_line(std::shared_ptr<std::string> line) noexcept {
+            m_line = line;
+            changed(true);
         }
     private:
         //Drw screen without readline mode
@@ -38,7 +46,7 @@ namespace gui {
     private:
         std::string m_char {};
         bool m_addchar {};
-        std::string m_line;
+        std::shared_ptr<std::string> m_line;
         bool m_readline_mode {};
     };
 }
