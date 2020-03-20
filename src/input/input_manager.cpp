@@ -82,6 +82,8 @@ bool input_manager::readline_mode()
 {
     auto ch = getch();
     if(ch==ERR) return false;
+    if(ch>255) return false;
+    if(ch<0) return false;
     switch(ch) {
         // Leave mode
         case CTRL('c'): 
