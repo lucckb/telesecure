@@ -41,8 +41,7 @@ bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
         const auto begin = std::make_reverse_iterator(m_view->end());
         const auto end = std::make_reverse_iterator(m_view->begin());
         wclear(win);
-        scrollok(win, TRUE);
-        int curr_y = maxy-1;
+        int curr_y = maxy;
         for (auto i=begin;i!=end; ++i) {
             if(!i->second) {   //Is Sender
                 setcolor(win,fgcolor(),bgcolor());
@@ -58,7 +57,6 @@ bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
             curr_y -= rls;
             if(curr_y<=0) break;
         }
-        scrollok(win, FALSE);
         curs_set(2);
     }
     return ret;
