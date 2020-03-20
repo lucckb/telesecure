@@ -30,7 +30,7 @@ namespace gui {
         void on_readline_handle(const char* prompt, const char* linebuf, int point);
     private:
         std::string m_char {};
-        bool m_delchar {};
+        bool m_addchar {};
         std::string m_line;
     };
 }

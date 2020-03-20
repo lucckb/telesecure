@@ -58,11 +58,11 @@ void window::resize(const rect& rect)
   
         mvwin(m_ctx->win(),rect.y+1,rect.y+1);
         wresize(m_ctx->win(),rect.cy-2,rect.cx-2);
-        wclear(m_ctx->win());
+        //wclear(m_ctx->win());
     } else {
         mvwin(m_ctx->win(),rect.y,rect.x);
         wresize(m_ctx->win(),rect.cy,rect.cx);
-        wclear(m_ctx->win());
+       // wclear(m_ctx->win());
     }
     do_draw_screen(*m_ctx);
     if(m_border) {

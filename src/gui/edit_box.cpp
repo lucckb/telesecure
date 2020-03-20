@@ -70,13 +70,13 @@ bool edit_box::do_draw_screen( detail::window_driver_context& ctx )
     auto ret {changed()};
     if(changed()) {      
         auto win = ctx.win();
-        if(m_delchar) {
-            m_delchar = false;
+        if(m_addchar) {
+            waddstr(win,m_char.c_str());
+            m_addchar = false;
+        } else {
             wclear(win);
             waddstr(win,m_line.c_str());
-        } else {
-            waddstr(win,m_char.c_str());
-        }
+        } 
     } else {
         ret = true;
     }
@@ -95,13 +95,13 @@ void edit_box::add_new_char( std::string_view ch )
     m_char = ch;
     changed(true);
     m_line += ch;
+    m_addchar = true;
 }
 
  //Delete char at cursor
 void edit_box::del_char()
 {
     changed(true);
-    m_delchar = true;
     pop_utf8(m_line);
 }
 
@@ -109,7 +109,6 @@ void edit_box::del_char()
 void edit_box::clear()
 {
     changed(true);
-    m_delchar = true;
     m_line.clear();
 }
 
