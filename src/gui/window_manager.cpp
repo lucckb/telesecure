@@ -26,6 +26,7 @@ window_manager::window_manager()
    }
    curses_init();
    init_signals();
+    m_mgr = this;
 }
 
 //! Destructor
