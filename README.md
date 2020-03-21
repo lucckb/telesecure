@@ -13,7 +13,7 @@ called in short **telesecure**
     * Current active chat is higlighted with text underline
     * When the user is online on the chat initial on the status bar is yellow
     * When the user is typing message on the chat initial on status bar is blue
-    * When the new message arrive from the user * char is added on the status bar
+    * When the new message arrives from the user * char is added on the status bar
 
 ## Shortcuts
 * **F1-F12**: Switch between chat buffers
@@ -60,5 +60,4 @@ make
 ## TODO ##
 * Support for last seen time on users
 * Maybe unlimited number of buffers with intelligent status bar 
-rewind and switch
 * Uploading and downloading media files
