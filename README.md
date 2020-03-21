@@ -30,7 +30,7 @@ called in short **telesecure**
 
 ## Supported commands
 * **msg** ***chat_id message***: Send message to the user
-* **authpass** ***password**: Send authentication password when required
+* **authpass** ***password***: Send authentication password when required
 * **delchat** ***chat_id***: Delete chat with particular chat identifier
 * **authphoneno** ***phone_number***: Send phone number for authentication
 * **authcode** ***code***: Pass authentication code
