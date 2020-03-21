@@ -463,11 +463,12 @@ std::vector<std::pair<int,long>> tele_app::read_config()
     try {
         pt::read_xml(util::home_dir()+conf_file, tree);
         auto child =  tree.get_child("config.chats");
+        int chat_slot {1};
         for(const auto& el: child) {
             if(el.first=="item") {
-                auto chat_id = el.second.get<int>("chat_id");
-                auto chat_slot = el.second.get<long>("chat_slot");
-                ret.push_back({chat_slot,chat_id});
+                auto chat_id = el.second.get<long>("chat_id");
+                ret.push_back({chat_slot++,chat_id});
+                if(chat_slot>=num_chats) break;
             }
         }
     } catch( const pt::xml_parser_error& er) {
