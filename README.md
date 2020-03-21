@@ -6,7 +6,7 @@ called in short **telesecure**
 
 ## Program features
 * 11 conurent chats allocated and key F2 - F12 for quick access
-* At F1 is a command console for telegram client, and it supports
+* At F1 is a command console for telegram client, and it supports:
     * Send quick message to the user without console allocation
     * Create and delete new chat
     * List channels and users
@@ -63,3 +63,4 @@ make
 * Support for last seen time on users
 * Maybe unlimited number of buffers with intelligent status bar 
 * Uploading and downloading media files
+* Managing address book (add, remove, edit users)
