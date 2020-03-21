@@ -81,6 +81,7 @@ void input_manager::loop()
         if(m_forward_readline) exitcode = readline_mode();
         else exitcode = normal_mode();
         if(exitcode) break;
+        if(!m_app.is_app_running()) break;
     }
 }
 

@@ -218,6 +218,9 @@ void tele_app::on_readline_completed(int code)
     std::unique_lock _lck(m_mtx);
     if(code == CppReadline::Console::NotFound) {
         m_chats[0]->add_line("Command not found");
+    } else if(code==CppReadline::Console::Quit) {
+        m_chats[0]->add_line("App closing. Please wait...");
+        m_app_running = false;
     }
     m_win.repaint();
 }

@@ -41,6 +41,9 @@ namespace app {
             std::unique_lock _lck(m_mtx);
             control_message_nlock(msg);
         }
+        auto is_app_running() const noexcept {
+            return m_app_running;
+        }
          //Restore last buffers
         void restore_opened_buffers();
         //On user start or stop typing
@@ -105,5 +108,6 @@ namespace app {
         const std::unique_ptr<telegram_cli> m_tcli;
         gui::window_manager m_win;
         std::shared_mutex m_mtx;
+        bool m_app_running {true};
     };
 }
