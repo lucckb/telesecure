@@ -2,8 +2,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules")
 
 cmake_minimum_required(VERSION 3.12.4 FATAL_ERROR)
 project(telesecure VERSION 1.0 LANGUAGES CXX)
+
 find_package(Td 1.6.0 REQUIRED)
-set(CURSES_NEED_WIDE TRUE)
+# Ncurses on OSX is wide by default but without cursesw.h header
+if( NOT APPLE )
+    set(CURSES_NEED_WIDE TRUE)
+    message("On OSX")
+endif()
 find_package(Curses REQUIRED)
 find_package(Readline REQUIRED)
 
