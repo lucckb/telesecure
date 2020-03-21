@@ -3,6 +3,7 @@
 #include <memory>
 #include <array>
 #include <input/Console.hpp>
+#include <input/input_manager.hpp>
 #include <shared_mutex>
 
 namespace gui {
@@ -46,24 +47,41 @@ namespace app {
         void on_user_typing( std::int64_t id, bool typing );
         //Set online status 
         void set_online_status( std::int64_t id, bool online);
+        // When char is deleted
+        void on_add_char(std::string_view ch);
+        //On delete char
+        void on_delete_char();
+        //On leave session
+        void on_leave_session();
+        //Callback when input data completed
+        void on_line_completed( );
+        //When buffer should be switched
+        void on_switch_buffer(int window);
+        //On forward to readline
+        void on_forward_char_to_readline(char ch);
+        //On switch right
+        void on_switch_right();
+        //On switch right
+        void on_switch_left();
+        //On page up 
+        void on_page_up();
+        //On page down
+        void on_page_down();
+        //On clear edit
+        void on_clear_edit();
     private:
-        //Initialize GUI
+        //Initialize gui
         void init_gui();
         //Initialize input
         void init_input();
         //Register commands
         void register_commands();
-        //Callback when input data completed
-        void on_line_completed( );
         // On switch buffer
         void on_switch_buffer_nolock(int window);
-        void on_switch_buffer(int window);
         //! When readline parser complete commmand
         void on_readline_completed(int code);
         //! Open and create new chat
         int on_new_chat_create(const CppReadline::Console::Arguments& args);
-        //On leave session
-        void on_leave_session();
         //! When chat found
         std::pair<std::shared_ptr<gui::chat_doc>,int> find_chat(id_t id) noexcept;
         //! Find first free chat indentifier
@@ -78,11 +96,13 @@ namespace app {
         void save_opened_buffers();
         //Read configuration
         std::vector<std::pair<int,long>> read_config();
+
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         std::array<std::shared_ptr<std::string>,num_chats> m_edit_lines;
         int m_current_buffer {};
         std::unique_ptr<CppReadline::Console> m_console;
+        input::input_manager m_inp;
         const std::unique_ptr<telegram_cli> m_tcli;
         std::shared_mutex m_mtx;
     };

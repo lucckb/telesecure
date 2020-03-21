@@ -4,7 +4,7 @@
 #include <locale>
 #include <codecvt>
 #include <cstring>
-
+#include <app/tele_app.hpp>
 
 namespace {
     constexpr auto CTRL(int ch) {
@@ -66,6 +66,13 @@ namespace {
 namespace input
 {
 
+//Constructor
+input_manager::input_manager(app::tele_app& app)
+    : m_app(app)
+{
+
+}
+
 //Handle input loop
 void input_manager::loop()
 {
@@ -90,12 +97,8 @@ bool input_manager::readline_mode()
             return true;
         //Leave temporary
         case CTRL('p'):
-            m_leave_cb();
+            m_app.on_leave_session();
             break;  
-        // Switch data buffer
-        case KEY_F(1)...KEY_F(12):
-           m_switch_window_cb(ch-KEY_F(1));
-           break;
         //Handle fn keypad manually
         case key::escape: {
            char buf[16] {};
@@ -103,46 +106,47 @@ bool input_manager::readline_mode()
            //Switch buffer handle
            for(int i=0;i<keytab_sz;i++) {
                if(!memcmp(keytab[i],buf,n)) {
-                    m_switch_window_cb(i);
+                    m_app.on_switch_buffer(i);
                     return false;
                }
            }
            //Arrow right handle
            for(int i=0;i<arrow_sz;i++) {
                if(!memcmp(arrow_right[i],buf,n)) {
-                    m_switch_right_cb();
+                    m_app.on_switch_right();
                     return false;
                }
            }
            //Arrow left handle
            for(int i=0;i<arrow_sz;i++) {
                if(!memcmp(arrow_left[i],buf,n)) {
-                    m_switch_left_cb();
+                    m_app.on_switch_left();
                     return false;
                }
            }
            //Page up handle
            for(int i=0;i<pagekey_sz;i++) {
                if(!memcmp(page_up[i],buf,n)) {
-                    m_pageup_cb();
+                    m_app.on_page_up();
                     return false;
                }
            }
           // Page down handle
           for(int i=0;i<pagekey_sz;i++) {
                if(!memcmp(page_down[i],buf,n)) {
-                    m_pagedn_cb();
+                    m_app.on_page_down();
                     return false;
                }
           }
          // Other keys
-         m_readline_cb(key::escape);
-         back_multichars(buf,n);
+        m_app.on_forward_char_to_readline(key::escape);
+        back_multichars(buf,n);
         }
         break;
         default:
             // Forward to readline
-            m_readline_cb(ch);
+            m_app.on_forward_char_to_readline(ch);
+            break;
     }
     return false;
 }
@@ -160,54 +164,54 @@ bool input_manager::normal_mode()
             return true;
         //Leave temporary
         case CTRL('p'):
-            m_leave_cb(); 
+            m_app.on_leave_session();
             break;
         case CTRL('a'):
-            m_clearedit_cb();
+            m_app.on_clear_edit();
             break;
         // Switch data buffer
         case KEY_F(1)...KEY_F(12):
-           m_switch_window_cb(ch-KEY_F(1));
+           m_app.on_switch_buffer(ch-KEY_F(1));
            break;
         // Delete character
         case key::backspace:
-            m_delete_char_cb();
+            m_app.on_delete_char();
             break;
         case key::backspace2:
             if(ret==KEY_CODE_YES) {
-                m_delete_char_cb();
+                m_app.on_delete_char();
             } else {
-                m_add_char_cb(convert.to_bytes(ch));
+                m_app.on_add_char(convert.to_bytes(ch));
             }
             break;
         //Line completed
         case key::enter:
-            m_line_completed_cb();
+            m_app.on_line_completed();
             break;
         //Right arrow
         case key::right_arrow:
         case key::right_arrow2:
-            m_switch_right_cb();
+            m_app.on_switch_right();
             break;
         //Left arrow
         case key::left_arrow:
         case key::left_arrow2:
-            m_switch_left_cb();
+            m_app.on_switch_left();
             break;
         //Page up
         case key::page_up:
         case key::page_up2:
-            m_pageup_cb();
+            m_app.on_page_up();
             break;
         //Page down
         case key::page_dn:
         case key::page_dn2:
-            m_pagedn_cb();
+            m_app.on_page_down();
             break;
         //Forward to the input box
         default: 
             if(std::iswprint(ch) && ret!=KEY_CODE_YES) {
-                m_add_char_cb(convert.to_bytes(ch));
+                m_app.on_add_char(convert.to_bytes(ch));
             }
             break;
     }
@@ -243,7 +247,7 @@ int input_manager::read_multichars(char* buf, const size_t n)
 void input_manager::back_multichars(const char* buf, const size_t n)
 {
     for(int i=0;i<n;++i) {
-        m_readline_cb(buf[i]);
+        m_app.on_forward_char_to_readline(buf[i]);
     }
 }
 

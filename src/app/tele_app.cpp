@@ -23,7 +23,7 @@ namespace {
 
 // Constructor
 tele_app::tele_app()
-    : m_tcli(new telegram_cli(*this))
+    : m_inp(std::ref(*this)),m_tcli(new telegram_cli(*this))
 {
     for( auto& e : m_edit_lines ) {
         e = std::make_shared<std::string>();
@@ -53,87 +53,100 @@ void tele_app::init_gui()
    bar->add_user(m_chats.size()-1,"S H");
 }
 
+// When char is deleted
+void tele_app::on_add_char(std::string_view ch)
+{
+    std::unique_lock _lck(m_mtx);
+    auto& win = gui::window_manager::get();
+    win.win<gui::edit_box>(win_edit)->add_new_char(ch);
+    win.repaint();
+    if(m_current_buffer!=0) {   //When the chat is selected
+        m_tcli->update_typing_chat(m_chats[m_current_buffer]->id());
+    }
+}
+
+//On delete char
+void tele_app::on_delete_char()
+{
+    std::unique_lock _lck(m_mtx);
+    auto& win = gui::window_manager::get();
+    win.win<gui::edit_box>(win_edit)->del_char();
+    win.repaint();
+}
+
+//On forward to readline
+void tele_app::on_forward_char_to_readline(char ch)
+{
+    m_console->forwardToReadline(ch);
+}
+
+//On switch right
+void tele_app::on_switch_right()
+{
+    std::unique_lock _lck(m_mtx);
+    for(int i=m_current_buffer+1;i<m_chats.size();++i) {
+        if(m_chats[i]) {
+            on_switch_buffer_nolock(i);
+            gui::window_manager::get().repaint();
+            return; 
+        }
+    }
+}
+//On switch left
+void tele_app::on_switch_left()
+{
+    std::unique_lock _lck(m_mtx);
+    for(int i=m_current_buffer-1;i>=0;--i) {
+        if(m_chats[i]) {
+            on_switch_buffer_nolock(i);
+             gui::window_manager::get().repaint();
+            return; 
+        }
+    }
+}
+//On page up 
+void tele_app::on_page_up()
+{
+    std::unique_lock _lck(m_mtx);
+    auto& win = gui::window_manager::get();
+    win.win<gui::chat_view>(win_view)->scrolling(gui::chat_view::scroll_mode::up);
+    win.repaint();
+}
+
+//On page down
+void tele_app::on_page_down()
+{
+    std::unique_lock _lck(m_mtx);
+    auto& win = gui::window_manager::get();
+    win.win<gui::chat_view>(win_view)->scrolling(gui::chat_view::scroll_mode::down);
+    win.repaint();
+}
+
+//On clear edit
+void tele_app::on_clear_edit()
+{
+    std::unique_lock _lck(m_mtx);
+    auto& win = gui::window_manager::get();
+    win.win<gui::edit_box>(win_edit)->clear();
+    win.repaint();
+}
 // Initialize input box
 void tele_app::init_input()
 {
-    auto& inp = input::input_manager::get(); 
     auto& win = gui::window_manager::get();
     m_console = std::make_unique<CppReadline::Console>(">");
-    inp.register_add_char([&](std::string_view ch) {
-        std::unique_lock _lck(m_mtx);
-        win.win<gui::edit_box>(win_edit)->add_new_char(ch);
-        win.repaint();
-        if(m_current_buffer!=0) {   //When the chat is selected
-            m_tcli->update_typing_chat(m_chats[m_current_buffer]->id());
-        }
-   });
-    inp.register_delete_char([&](){
-        std::unique_lock _lck(m_mtx);
-        win.win<gui::edit_box>(win_edit)->del_char();
-        win.repaint();
-    });
-    inp.register_leave_session(std::bind(&tele_app::on_leave_session,this));
-    inp.register_line_completed(std::bind(&tele_app::on_line_completed,this));
-    inp.register_switch_window(std::bind(&tele_app::on_switch_buffer,this,std::placeholders::_1));
-    inp.forward_to_readline(true);
+    m_inp.forward_to_readline(true);
     win.win<gui::edit_box>(win_edit)->readline_mode(true);
     //Readline refresh added
     m_console->registerRedisplayCommand([&]() {
         std::unique_lock _lck(m_mtx);
         win.repaint();
     });
-    //Readline callback bind function
-    inp.register_readline_callback(
-        std::bind(&CppReadline::Console::forwardToReadline,
-        std::ref(m_console),std::placeholders::_1)
-    );
     //When readline option completed 
     m_console->registerCommandCompleted(
         std::bind(&tele_app::on_readline_completed, this, std::placeholders::_1)
     );
-    //When right arrow is pressed
-    inp.register_switch_right( [&]() {
-        std::unique_lock _lck(m_mtx);
-        for(int i=m_current_buffer+1;i<m_chats.size();++i) {
-            if(m_chats[i]) {
-                on_switch_buffer_nolock(i);
-                gui::window_manager::get().repaint();
-                return; 
-            }
-        }
-    });
-    //When prev arrow is pressed
-    inp.register_switch_left( [&]() {
-        std::unique_lock _lck(m_mtx);
-        for(int i=m_current_buffer-1;i>=0;--i) {
-            if(m_chats[i]) {
-                on_switch_buffer_nolock(i);
-                gui::window_manager::get().repaint();
-                return; 
-            }
-        }
-    });
-    //Register page up event
-    inp.register_pageup_cb([this]() {
-        std::unique_lock _lck(m_mtx);
-        auto& win = gui::window_manager::get();
-        win.win<gui::chat_view>(win_view)->scrolling(gui::chat_view::scroll_mode::up);
-        win.repaint();
-    });
-     //Register page up event
-    inp.register_pagedn_cb([this]() {
-        std::unique_lock _lck(m_mtx);
-        auto& win = gui::window_manager::get();
-        win.win<gui::chat_view>(win_view)->scrolling(gui::chat_view::scroll_mode::down);
-        win.repaint();
-    });
-    //Register clear edit callback
-    inp.register_clear_edit_cb([this]() { 
-        std::unique_lock _lck(m_mtx);
-        auto& win = gui::window_manager::get();
-        win.win<gui::edit_box>(win_edit)->clear();
-        win.repaint();
-    });
+ 
 }
 
 // Run main handler
@@ -143,8 +156,6 @@ void tele_app::run()
     init_gui();
     init_input();
     register_commands();
-
-    auto& inp = input::input_manager::get(); 
     auto& win = gui::window_manager::get();
     //Create windows
     win.create_all();
@@ -154,7 +165,7 @@ void tele_app::run()
     //Start telegram client
     m_tcli->start();
     //Start input main loop
-    inp.loop();
+    m_inp.loop();
     //Wait Stop the telegram client and wait for termination
     m_tcli->stop();
     m_tcli->wait_for_terminate();
@@ -180,7 +191,7 @@ void tele_app::on_switch_buffer_nolock(int num)
     if(m_chats[num]) {
        auto swin = win.win<gui::status_bar>(win_status);
        auto edit = win.win<gui::edit_box>(win_edit);
-       input::input_manager::get().forward_to_readline(num==0);
+       m_inp.forward_to_readline(num==0);
        edit->readline_mode(num==0);
        swin->set_active(num);
        swin->set_newmsg(num,false);
