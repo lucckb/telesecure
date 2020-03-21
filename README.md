@@ -1,4 +1,4 @@
-# Telegram ncurses console chat
+# Telegram client ncurses based console chat 
 "Telegram secure chat" is a simple ncurses based telegram client
 called in short **telesecure**
 
