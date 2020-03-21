@@ -2,6 +2,8 @@
 "Telegram secure chat" is a simple ncurses based telegram client
 called in short **telesecure**
 
+![telesecure screen](https://bryndza.boff.pl/downloads/telesecure.png)
+
 ## Program features
 * 11 conurent chats allocated and key F2 - F12 for quick access
 * At F1 is a command console for telegram client, and it supports
