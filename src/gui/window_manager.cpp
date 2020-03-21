@@ -12,18 +12,27 @@
 
 namespace gui {
 
+namespace {
+    window_manager* m_mgr;
+}
+
+
 //! Constructor
 window_manager::window_manager()
 {
    //!Initialize ncurses
+   if(m_mgr) {
+       throw std::logic_error("Window manager already created");
+   }
    curses_init();
    init_signals();
 }
 
 //! Destructor
 window_manager::~window_manager() 
-{
-  curses_destroy();
+{   
+    m_mgr = nullptr;
+    curses_destroy();
 }
 
 //! Initialize ncurses library 
@@ -101,7 +110,7 @@ void window_manager::init_signals()
             );
             }
             resizeterm(w.ws_row,w.ws_col);
-            get().resize_all();
+            if(m_mgr) m_mgr->resize_all();
         } );
         a1.wait();
     };

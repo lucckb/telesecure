@@ -12,10 +12,8 @@ namespace gui {
 
 class window_manager {
 public:
-    static window_manager& get() {
-        static window_manager wnd;
-        return wnd;
-    } 
+    //! Constructor
+    window_manager( );
     //! Noncopyable 1
     window_manager(window_manager&) = delete;
     //! Noncopyable 2 
@@ -43,8 +41,6 @@ public:
            return ret;
        }
 private:
-     //! Constructor
-    window_manager( );
     // Initialize ncurses library
     void curses_init();
     // Destroy ncurses library 

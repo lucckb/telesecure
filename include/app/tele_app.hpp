@@ -5,9 +5,9 @@
 #include <input/Console.hpp>
 #include <input/input_manager.hpp>
 #include <shared_mutex>
+#include <gui/window_manager.hpp>
 
 namespace gui {
-    class window_manager;
     class chat_doc;
 }
 namespace input {
@@ -96,7 +96,6 @@ namespace app {
         void save_opened_buffers();
         //Read configuration
         std::vector<std::pair<int,long>> read_config();
-
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
         std::array<std::shared_ptr<std::string>,num_chats> m_edit_lines;
@@ -104,6 +103,7 @@ namespace app {
         std::unique_ptr<CppReadline::Console> m_console;
         input::input_manager m_inp;
         const std::unique_ptr<telegram_cli> m_tcli;
+        gui::window_manager m_win;
         std::shared_mutex m_mtx;
     };
 }
