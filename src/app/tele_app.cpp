@@ -59,7 +59,7 @@ void tele_app::on_add_char(std::string_view ch)
     m_win.win<gui::edit_box>(win_edit)->add_new_char(ch);
     m_win.repaint();
     if(m_current_buffer!=0) {   //When the chat is selected
-        m_tcli->update_typing_chat(m_chats[m_current_buffer]->id());
+        m_tcli->update_typing_chat(m_chats[m_current_buffer]->id(),true);
     }
 }
 
@@ -69,6 +69,9 @@ void tele_app::on_delete_char()
     std::unique_lock _lck(m_mtx);
     m_win.win<gui::edit_box>(win_edit)->del_char();
     m_win.repaint();
+    if(m_current_buffer!=0) {   //When the chat is selected
+        m_tcli->update_typing_chat(m_chats[m_current_buffer]->id(),true);
+    }
 }
 
 //On forward to readline
@@ -173,6 +176,9 @@ void tele_app::on_line_completed( )
     m_tcli->send_message_to(id,ebox->line());
     ebox->clear();
     m_win.repaint();
+    if(m_current_buffer!=0) {   //When the chat is selected
+        m_tcli->update_typing_chat(m_chats[m_current_buffer]->id(),false);
+    }
 } 
 
 // On switch buffer

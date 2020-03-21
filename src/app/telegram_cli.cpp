@@ -359,15 +359,19 @@ void telegram_cli::send_message_to(std::int64_t id, std::string_view msg)
 }
 
 //Update typing
-void telegram_cli::update_typing_chat(std::int64_t chat_id)
+void telegram_cli::update_typing_chat(std::int64_t chat_id, bool typing)
 {
     std::unique_lock _lck(m_typing_lock);
     const auto now = std::chrono::steady_clock::now();
-    if(!m_chat_typing[chat_id].second) {
-        m_chat_typing[chat_id] = std::make_pair(now,true);
-        auto typing_obj = td_api::make_object<td_api::chatActionTyping>();
-        auto chat_action_obj = td_api::make_object<td_api::sendChatAction>(chat_id,std::move(typing_obj));
-        send_query(std::move(chat_action_obj),{});
+    if(!m_chat_typing[chat_id].second && typing) {
+        m_chat_typing[chat_id] = std::make_pair(now,typing);
+        if(typing) {
+            auto typing_obj = td_api::make_object<td_api::chatActionTyping>();
+            auto chat_action_obj = td_api::make_object<td_api::sendChatAction>(chat_id,std::move(typing_obj));
+            send_query(std::move(chat_action_obj),{});
+        }
+    } else {
+         m_chat_typing[chat_id] = std::make_pair(now,typing);
     }
 }
 

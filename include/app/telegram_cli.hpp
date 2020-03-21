@@ -75,7 +75,7 @@ namespace app {
         //Send message to the selected chat client
         void send_message_to(std::int64_t id, std::string_view msg);
         //Update typing
-        void update_typing_chat(std::int64_t chat_id);
+        void update_typing_chat(std::int64_t chat_id, bool typing);
     private:
         //Telegram main client thread
         void client_thread();
