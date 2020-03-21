@@ -7,7 +7,6 @@ find_package(Td 1.6.0 REQUIRED)
 # Ncurses on OSX is wide by default but without cursesw.h header
 if( NOT APPLE )
     set(CURSES_NEED_WIDE TRUE)
-    message("On OSX")
 endif()
 find_package(Curses REQUIRED)
 find_package(Readline REQUIRED)
