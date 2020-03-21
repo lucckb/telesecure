@@ -78,21 +78,28 @@ bool edit_box::do_draw_screen( detail::window_driver_context& ctx )
 //! Draw screen 2
 bool edit_box::draw_screen(detail::window_driver_context& ctx)
 {
-    auto ret {changed()};
     if(!m_line) return false;
     if(changed()) {      
         auto win = ctx.win();
         if(m_addchar) {
             waddstr(win,m_char.c_str());
-            m_addchar = false;
-        } else {
+        } else if(m_delchar) {
+            int y,x;
+            getyx(win,y,x);
+            const auto maxx = getmaxx(win);
+            if(x>0) { --x; }
+            else { if(y>0) { --y; x=maxx-1; }}
+            wmove(win,y,x);
+            wdelch(win);
+        }
+        else {
             wclear(win);
-            waddstr(win,m_line->c_str());
+            if(m_line->empty()) wmove(win,0,0); 
+            else waddstr(win,m_line->c_str());
         } 
-    } else {
-        ret = true;
+        m_addchar = m_delchar = false;
     }
-    return ret;
+    return changed();
 }
 
 // When window is created
@@ -120,6 +127,7 @@ void edit_box::del_char()
         throw std::logic_error("Null pointer exception");
     } 
     changed(true);
+    m_delchar = true;
     pop_utf8(*m_line);
 }
 
@@ -131,6 +139,17 @@ void edit_box::clear()
     } 
     changed(true);
     m_line->clear();
+}
+
+ //Cursor set vinal position
+void edit_box::cursor_set() noexcept
+{
+    int y,x;
+    auto win = ctx().win();
+    getyx(win,y,x);
+    wmove(win,y,x);
+    curs_set(2);
+    wnoutrefresh(win);
 }
 
 // Readline handle outside the readline

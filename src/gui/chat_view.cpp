@@ -36,7 +36,6 @@ bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
         auto win = ctx.win();
         int maxx,maxy;
         getmaxyx(win,maxy,maxx);
-        curs_set(0);
         //Calculate lines from the end
         const auto begin = std::make_reverse_iterator(m_view->end());
         const auto end = std::make_reverse_iterator(m_view->begin());
@@ -57,7 +56,6 @@ bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
             curr_y -= rls;
             if(curr_y<=0) break;
         }
-        curs_set(2);
     }
     return ret;
 }

@@ -88,7 +88,9 @@ void window_manager::repaint( )
     wnoutrefresh(stdscr);
     for( auto wnd : m_winlist ) {
         if(!wnd) std::logic_error("Null Window exception");
+        curs_set(0);
         wnd->paint();
+        wnd->cursor_set();
         wnd->changed(false);
     }
     doupdate();

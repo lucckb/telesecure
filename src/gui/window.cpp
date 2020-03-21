@@ -72,4 +72,10 @@ void window::resize(const rect& rect)
     }
 }
 
+//Cursor final position on the last window
+void window::cursor_set() noexcept
+{
+    curs_set(0);
+}
+
 }

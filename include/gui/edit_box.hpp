@@ -38,6 +38,8 @@ namespace gui {
             m_line = line;
             changed(true);
         }
+        //Cursor set vinal position
+        void cursor_set() noexcept override;
     private:
         //Drw screen without readline mode
         bool draw_screen(detail::window_driver_context& ctx);
@@ -46,6 +48,7 @@ namespace gui {
     private:
         std::string m_char {};
         bool m_addchar {};
+        bool m_delchar {};
         std::shared_ptr<std::string> m_line;
         bool m_readline_mode {};
     };

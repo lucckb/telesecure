@@ -29,7 +29,6 @@ bool status_bar::do_draw_screen(detail::window_driver_context& ctx)
     auto ret {changed()};
     if(changed())
     {
-        curs_set(0);
         wclear(win);
         for( const auto& it : m_users ) {
             const auto& i = it.second;
@@ -44,7 +43,6 @@ bool status_bar::do_draw_screen(detail::window_driver_context& ctx)
             wprintw(win,"%s%c ", bar_name(i.username).c_str(),i.newmsg?'*':' ');
             if(m_active==it.first) unsetattributes(win);
         }
-        curs_set(2);
     }
     return ret;
 }

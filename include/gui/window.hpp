@@ -42,6 +42,8 @@ namespace gui {
         void changed(bool val) noexcept {
             m_changed = val;
         }
+        //Cursor final position on the last window
+        virtual void cursor_set() noexcept;
     protected:
         // Draw window but without refresh
         virtual bool do_draw_screen(detail::window_driver_context& ctx) = 0;
@@ -65,7 +67,6 @@ namespace gui {
         auto changed() const noexcept {
             return m_changed;
         }
-       
     private:
         color_t m_fg {};    //! Foreground color
         color_t m_bg {};    //! Background color
