@@ -62,7 +62,7 @@ void chat_doc::rewind( int nlines )
         for(;m_curr_line!=m_items.begin()&&real_lines>0; --real_lines) {
             --m_curr_line;
         }
-
+        ++m_curr_line;
     }
     m_changed = true;
 }
