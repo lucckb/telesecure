@@ -13,7 +13,7 @@ namespace {
 
 //Default constructor
 status_bar::status_bar(color_t bg, color_t fg)
-     : window(1,bg,fg,false)
+     : window(1,bg,fg)
 {
 }
 

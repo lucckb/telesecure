@@ -56,7 +56,7 @@ namespace {
 
 //! Construtor
 edit_box::edit_box(color_t bg, color_t fg)
-    : window(2,bg,fg,false)
+    : window(2,bg,fg)
 {
 }
 

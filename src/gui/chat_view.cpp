@@ -10,7 +10,7 @@ namespace gui {
 
 //! Construtor
 chat_view::chat_view(color_t bg, color_t fg)
-       : window(0,bg,fg,false)
+       : window(0,bg,fg)
 {
 }
 

@@ -18,7 +18,7 @@ namespace gui {
     class window {
     public:
         //! Public constructor
-        window(int recommended_size, color_t bg, color_t fg, bool border);
+        window(int recommended_size, color_t bg, color_t fg);
         //! Destructor
         virtual ~window();
         //! Noncopyable 1
@@ -29,10 +29,6 @@ namespace gui {
         bool paint();
         // Resize window according to signal
         virtual void resize(const rect& rect);
-        // Get border 
-        auto has_border() const {
-            return m_border;
-        }
         auto recommended_size() const {
             return m_recommended_size;
         }
@@ -70,7 +66,6 @@ namespace gui {
     private:
         color_t m_fg {};    //! Foreground color
         color_t m_bg {};    //! Background color
-        bool m_border {};   //! Draw border
         int m_recommended_size {};  //! Recommended size
         std::unique_ptr<detail::window_driver_context> m_ctx;
         bool m_changed {true};
