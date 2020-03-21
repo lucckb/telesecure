@@ -214,7 +214,7 @@ bool input_manager::normal_mode()
                 m_app.on_add_char(convert.to_bytes(ch));
             }
             break;
-    }
+    } 
     return false;
 }
 

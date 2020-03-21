@@ -21,11 +21,11 @@ namespace {
 window_manager::window_manager()
 {
    //!Initialize ncurses
-   if(m_mgr) {
-       throw std::logic_error("Window manager already created");
-   }
-   curses_init();
-   init_signals();
+    if(m_mgr) {
+        throw std::logic_error("Window manager already created");
+    }
+    curses_init();
+    init_signals();
     m_mgr = this;
 }
 
@@ -110,7 +110,7 @@ void window_manager::init_signals()
                 "unable to get terminal size"
             );
             }
-            resizeterm(w.ws_row,w.ws_col);
+            resize_term(w.ws_row,w.ws_col);
             if(m_mgr) m_mgr->resize_all();
         } );
         a1.wait();
