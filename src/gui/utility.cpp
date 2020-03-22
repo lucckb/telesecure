@@ -2,7 +2,7 @@
 #include <curses.h>
 #include <string>
 #include <sstream>
-
+#include <codecvt>
 
 namespace gui {
 
@@ -95,14 +95,23 @@ void pop_utf8(std::string& x) {
 std::vector<std::string> split_string(const std::string& str, std::size_t max) 
 {
         std::vector<std::string> output;
-        std::istringstream iss(str);
-	    std::string word;
-        while((iss >> word)) {	
-	        // Check if the last element can still hold another word (+ space)
-	        if (output.size() > 0 && (output[output.size() - 1].size() + word.size() + 1) <= max)
-	            output[output.size() - 1] += ' ' + word;
-	        else        
-	            output.push_back(word);
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert;
+        const auto wstr = convert.from_bytes(str);
+        std::wistringstream iss(wstr);
+	    std::wstring word;
+        while((iss >> word)) {
+            if(word.size()<= max ) {
+                // Check if the last element can still hold another word (+ space)
+                if (output.size() > 0 && (convert.from_bytes(output[output.size() - 1]).size() + word.size() + 1) <= max)
+                    output[output.size() - 1] += ' ' + convert.to_bytes(word);
+                else        
+                    output.push_back(convert.to_bytes(word));
+            } else {
+                for(auto i=0UL,left=word.size(); i<word.size(); i+=max) {
+                    const auto subs = word.substr(i,max);
+                    output.push_back(convert.to_bytes(subs));
+                }
+            }
 	    }
         return output;
 }
