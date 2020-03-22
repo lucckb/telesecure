@@ -91,6 +91,9 @@ bool edit_box::draw_screen(detail::window_driver_context& ctx)
             else { if(y>0) { --y; x=maxx-1; }}
             wmove(win,y,x);
             wdelch(win);
+            if(y==0&&x==0) {
+                waddstr(win,m_line->c_str());
+            }
         }
         else {
             wclear(win);
