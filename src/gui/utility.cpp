@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <codecvt>
+#include <locale>
 
 namespace gui {
 
