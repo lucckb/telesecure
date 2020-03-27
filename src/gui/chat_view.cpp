@@ -51,7 +51,7 @@ bool chat_view::do_draw_screen( detail::window_driver_context& ctx )
             const auto rls = real_lines.size();
             const auto start_ln = curr_y - rls;
             for(int y=start_ln,n=0; n<rls ;++n,++y) {
-                mvwaddstr(win,y,0,(real_lines[n]+"\n").c_str());
+                mvwaddstr(win,y,0,real_lines[n].c_str());
             }
             curr_y -= rls;
             if(curr_y<=0) break;
