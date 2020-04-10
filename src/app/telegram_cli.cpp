@@ -154,6 +154,7 @@ void telegram_cli::process_update(td_api::object_ptr<td_api::Object> update)
                          auto msg_id = update_new_message.message_->id_;
                          auto outgoing = update_new_message.message_->is_outgoing_;
                          auto sender_user_name = get_user_name(update_new_message.message_->sender_user_id_);
+                         auto msg_date = update_new_message.message_->date_;
                          std::string text;
                          if (update_new_message.message_->content_->get_id() == td_api::messageText::ID)
                          {
@@ -163,7 +164,7 @@ void telegram_cli::process_update(td_api::object_ptr<td_api::Object> update)
                          {
                              text = "Photo received caption:" + static_cast<td_api::messagePhoto &>(*update_new_message.message_->content_).caption_->text_;
                          }
-                         m_app.on_new_message(chat_id, msg_id, sender_user_name, text,outgoing);
+                         m_app.on_new_message(chat_id, msg_id, sender_user_name, text, outgoing, msg_date);
                      },
                      [this](td_api::updateUserChatAction &chat_action) {
                          const auto action_id = chat_action.action_->get_id();

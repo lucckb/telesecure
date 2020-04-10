@@ -21,7 +21,7 @@ namespace gui {
             return std::make_shared<chat_doc>(id,who);
         }
         //Add single line
-        void add_line(std::string_view line, bool outgoing=false);
+        void add_line(std::string_view line, bool outgoing, std::time_t date);
         //Paging up or down
         void rewind( int nlines );
         //Get identifier

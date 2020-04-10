@@ -217,9 +217,9 @@ void tele_app::on_readline_completed(int code)
 {
     std::unique_lock _lck(m_mtx);
     if(code == CppReadline::Console::NotFound) {
-        m_chats[0]->add_line("Command not found");
+        m_chats[0]->add_line("Command not found",false,0);
     } else if(code==CppReadline::Console::Quit) {
-        m_chats[0]->add_line("App closing. Please wait...");
+        m_chats[0]->add_line("App closing. Please wait...",false,0);
         m_app_running = false;
     }
     m_win.repaint();
@@ -233,9 +233,9 @@ void tele_app::register_commands()
         "help", [&](const CppReadline::Console::Arguments&) {
             std::unique_lock _lck(m_mtx);
             auto view =  m_win.win<gui::chat_view>(win_view);
-            m_chats[0]->add_line("Available commands are:");
+            m_chats[0]->add_line("Available commands are:",false,0);
             for(auto& cmd : m_console->getRegisteredCommands()) {
-                m_chats[0]->add_line("\t " + cmd);
+                m_chats[0]->add_line("\t " + cmd,false,0);
             }
             return 0;
     });
@@ -336,12 +336,12 @@ int tele_app::find_existing_chat(id_t id) noexcept
 }
 
 //When new message from chat
-void tele_app::on_new_message(std::int64_t id, std::int64_t msgid, std::string_view name, std::string_view msg, bool outgoing)
+void tele_app::on_new_message(std::int64_t id, std::int64_t msgid, std::string_view name, std::string_view msg, bool outgoing, std::time_t date)
 {
     using namespace std::string_literals;
     std::unique_lock _lck(m_mtx);
     auto chat = find_chat(id); 
-    chat.first->add_line(!chat.second?("[" + std::to_string(id)+"] [" + std::string(name)+ "]: "s + std::string(msg)):msg,outgoing);
+    chat.first->add_line(!chat.second?("[" + std::to_string(id)+"] [" + std::string(name)+ "]: "s + std::string(msg)):msg,outgoing,date);
     chat.first->last_message_id(msgid);
     const auto nid = find_existing_chat(id);
     if(m_current_buffer==chat.second) m_tcli->view_message(id,msgid);
@@ -352,7 +352,7 @@ void tele_app::on_new_message(std::int64_t id, std::int64_t msgid, std::string_v
 //New control message
 void tele_app::control_message_nlock(std::string_view msg)
 {
-    m_chats[0]->add_line(msg);
+    m_chats[0]->add_line(msg,false,0);
     if(m_current_buffer!=0) {
         m_win.win<gui::status_bar>(win_status)->set_newmsg(0,true);
     }
@@ -504,7 +504,7 @@ void tele_app::on_leave_session()
     child c("ps aux", std_out > pipe_stream);
     std::string line;
     while (pipe_stream && std::getline(pipe_stream, line) && !line.empty())
-        m_chats[m_chats.size()-1]->add_line(line);
+        m_chats[m_chats.size()-1]->add_line(line,false,0);
     c.wait();
     m_win.repaint();
 }

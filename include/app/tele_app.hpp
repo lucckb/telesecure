@@ -35,7 +35,7 @@ namespace app {
         //Main thread
         void run();
         //When new message from chat
-        void on_new_message(std::int64_t id, std::int64_t msgid, std::string_view name, std::string_view msg, bool outgoing);
+        void on_new_message(std::int64_t id, std::int64_t msgid, std::string_view name, std::string_view msg, bool outgoing, std::time_t date);
         //New control message
         void new_control_message(std::string_view msg) {
             std::unique_lock _lck(m_mtx);

@@ -5,10 +5,10 @@ namespace gui
 {
 
 namespace {
-    std::string string_time()
+    std::string string_time(std::time_t tim)
     {
         char buf[32] {};
-        auto tim = std::time(nullptr);
+        if(tim<=0) tim = std::time(nullptr);
         auto tm = std::localtime(&tim);
         std::snprintf(buf,sizeof buf,"%02i:%02i",tm->tm_hour,tm->tm_min);
         return buf;
@@ -16,11 +16,11 @@ namespace {
 }
 
 //Add single line
-void chat_doc::add_line(std::string_view line, bool outgoing)
+void chat_doc::add_line(std::string_view line, bool outgoing, std::time_t date)
 { 
     using namespace std::string_literals;
     auto who = outgoing?"Me"s:m_who;
-    auto fmtline = who + "@"s + string_time() + "> "s + std::string(line);
+    auto fmtline = who + "@"s + string_time(date) + "> "s + std::string(line);
     m_items.emplace_back(std::move(fmtline),outgoing);
     while(m_items.size() > maxnlines) {
     m_items.pop_front();
