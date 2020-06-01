@@ -53,10 +53,13 @@ namespace gui {
         void maxx(int max_) noexcept {
             m_maxx = max_;
         }
+        void who(std::string_view _who) {
+            m_who = _who;
+        }
     private:
         std::list<std::pair<std::string,bool>> m_items;
         std::list<std::pair<std::string,bool>>::iterator m_curr_line { m_items.end() };
-        const std::string m_who;
+        std::string m_who;
         const id_t m_id;
         id_t m_last_msg_id;
         bool m_changed { true };

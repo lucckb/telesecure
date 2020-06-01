@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <array>
+#include <map>
 #include <input/Console.hpp>
 #include <input/input_manager.hpp>
 #include <shared_mutex>
@@ -101,6 +102,7 @@ namespace app {
         std::vector<std::pair<int,long>> read_config();
     private:
         std::array<std::shared_ptr<gui::chat_doc>,num_chats> m_chats;
+        std::map<long,std::string> m_local_name_aliases;         //Local map aliases
         std::array<std::shared_ptr<std::string>,num_chats> m_edit_lines;
         int m_current_buffer {};
         std::unique_ptr<CppReadline::Console> m_console;

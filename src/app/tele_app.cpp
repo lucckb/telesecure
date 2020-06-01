@@ -298,6 +298,58 @@ void tele_app::register_commands()
     m_console->registerCommand(
         "delchat", std::bind(&tele_app::on_new_chat_delete, this, std::placeholders::_1)
     );
+    //Register command add alisas
+    m_console->registerCommand("addnamealias", [&](const CppReadline::Console::Arguments& args) {
+        if(args.size()<3) {
+            new_control_message("addnamealias: missing id or name");
+            return CppReadline::Console::ReturnCode::Error;
+        }
+        long id;
+        try {
+             id = std::stol(args[1]);
+        } catch( std::invalid_argument& ) {
+            new_control_message("addnamealias: Invalid argument");
+            return CppReadline::Console::ReturnCode::Error;
+        }
+        std::string msgs;
+        for(auto iv=args.begin()+2;iv!=args.end();++iv) msgs += *iv + " ";
+        m_local_name_aliases[id] = msgs;
+        const int nid = find_existing_chat(id);
+        if(nid>0) {
+            m_chats[nid]->who(msgs);
+        }
+        return CppReadline::Console::ReturnCode::Ok;
+    });
+    //Register command del alisas
+    m_console->registerCommand("delnamealias", [&](const CppReadline::Console::Arguments& args) {
+        if(args.size()!=2) {
+            new_control_message("delnamealias: missing id");
+            return CppReadline::Console::ReturnCode::Error;
+        }
+        long id;
+        try {
+             id = std::stol(args[1]);
+        } catch( std::invalid_argument& ) {
+            new_control_message("delnamealias: Invalid argument");
+            return CppReadline::Console::ReturnCode::Error;
+        }
+        const auto it = m_local_name_aliases.find(id);
+        if(it==m_local_name_aliases.end()) {
+            new_control_message("delnamealias: Selected alias not found");
+            return CppReadline::Console::ReturnCode::Error;
+        }
+        m_local_name_aliases.erase(it);
+        return CppReadline::Console::ReturnCode::Ok;
+    });
+    //List named alias
+    m_console->registerCommand(
+        "listnamealias", [&](const CppReadline::Console::Arguments& args) {
+            new_control_message("Name aliases list:");
+            for(const auto& alias: m_local_name_aliases ) {
+                new_control_message( "ID: " + std::to_string(alias.first) + " NAME: " + alias.second );
+            }
+            return CppReadline::Console::ReturnCode::Ok;
+     });
     //Send message to the selected chat
     m_console->registerCommand(
         "msg", [&](const CppReadline::Console::Arguments& args) {
@@ -395,7 +447,8 @@ int tele_app::on_new_chat_create(const CppReadline::Console::Arguments& args)
     }
     m_tcli->open_chat(chat_id,[this,nid,chat_id]() {
         std::unique_lock _lck(m_mtx);
-        const auto title = m_tcli->get_chat_title(chat_id);
+        auto title_it = m_local_name_aliases.find(chat_id);
+        const auto title = title_it==m_local_name_aliases.end()?m_tcli->get_chat_title(chat_id):title_it->second;
         m_chats[nid] = gui::chat_doc::clone(chat_id,title);
         auto swin = m_win.win<gui::status_bar>(win_status);
         swin->add_user(nid,title);
@@ -450,6 +503,15 @@ void tele_app::save_opened_buffers()
         }
     }
     tree.add_child("config.chats",child);
+    pt::ptree child2;
+    for(auto it : m_local_name_aliases) {
+         pt::ptree item;
+         item.put("user_id", it.first);
+         item.put("user_name", it.second);
+         child2.add_child("item",item);
+    }
+    tree.add_child("config.chats",child);
+    tree.add_child("config.aliases",child2);
     std::filesystem::create_directories(util::home_dir()+conf_dir);
     pt::write_xml(util::home_dir()+conf_file,tree);
 }
@@ -471,8 +533,18 @@ std::vector<std::pair<int,long>> tele_app::read_config()
                 if(chat_slot>=num_chats) break;
             }
         }
-    } catch( const pt::xml_parser_error& er) {
+        auto child2 = tree.get_child("config.aliases");
+        for(const auto& el: child2) {
+            if(el.first=="item") {
+                auto user_id = el.second.get<long>("user_id");
+                auto user_name = el.second.get<std::string>("user_name");
+                m_local_name_aliases[user_id] = user_name;
+            }
+        }
+    } catch(const pt::xml_parser_error& er) {
       
+    } catch(const pt::ptree_bad_path& er) {
+
     }
     return ret;
 }
@@ -483,7 +555,8 @@ void tele_app::restore_opened_buffers()
     const auto chat_list = read_config();
     for(const auto& chat: chat_list) {
         m_tcli->open_chat(chat.second,[this,chat]() {
-            const auto title = m_tcli->get_chat_title(chat.second);
+            const auto it = m_local_name_aliases.find(chat.second);
+            const auto title = it==m_local_name_aliases.end()?m_tcli->get_chat_title(chat.second):it->second;
             m_chats[chat.first] = gui::chat_doc::clone(chat.second,title);
             auto swin = m_win.win<gui::status_bar>(win_status);
             swin->add_user(chat.first,title);
